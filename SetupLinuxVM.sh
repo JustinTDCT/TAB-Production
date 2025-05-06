@@ -19,6 +19,10 @@ echo ========== Get baseline config file ==========
 wget -O /etc/tab/conf/default.conf https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/default.conf
 echo ========== Loading baseline config file ==========
 source /etc/tab/conf/default.conf
+
+
+
+
 while :
 do
     clear
@@ -44,7 +48,12 @@ EOF
     read -n1 -s menu
     menu="${menu,,}"
     case "$menu" in
-    "0")  exit                      ;;
+    "a") if [ $veeamxfs == "yes" ]; then
+      $veeamxfs="no"
+      else
+      $veeamxfs="yes"
+      fi ;;
+    "x")  exit                      ;;
      * )  echo "invalid option"     ;;
     esac
     sleep 1
