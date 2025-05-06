@@ -54,6 +54,16 @@ EOF
       else
       veeamxfs="yes"
       fi ;;
+    "b") if [ $webmin == "yes" ]; then
+      webmin="no"
+      else
+      webmin="yes"
+      fi ;;
+    "d") if [ $docker == "yes" ]; then
+      docker="no"
+      else
+      docker="yes"
+      fi ;;
     #"z") if [ $veeamxfs == "yes" ]; then
     #  fi ;;
     "x")  exit                      ;;
