@@ -14,8 +14,9 @@ mkdir /etc/tab
 mkdir /etc/tab/conf
 mkdir /etc/tab/scripts
 mkdir /etc/tab/logs
-# Grab the baseline config file
+# Grab the baseline config file and load it
 echo ========== Get baseline config file ==========
 wget -O /etc/tab/conf/default.conf https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/default.conf
-
+echo ========== Loading baseline config file ==========
+source /etc/tab/conf/default.conf
 
