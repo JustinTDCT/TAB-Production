@@ -22,7 +22,7 @@ source /etc/tab/conf/default.conf
 
 
 
-
+# this is the main menu where you adjust how this machine will be setup
 while :
 do
     clear
@@ -44,6 +44,7 @@ do
 
   x. Abort and quit
   z. Start setup 
+  
 EOF
     read -n1 -s menu
     menu="${menu,,}"
@@ -52,6 +53,8 @@ EOF
       veeamxfs="no"
       else
       veeamxfs="yes"
+      fi ;;
+    "z") if [ $veeamxfs == "yes" ]; then
       fi ;;
     "x")  exit                      ;;
      * )  echo "invalid option"     ;;
