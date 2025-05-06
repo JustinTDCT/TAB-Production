@@ -49,9 +49,9 @@ EOF
     menu="${menu,,}"
     case "$menu" in
     "a") if [ $veeamxfs == "yes" ]; then
-      $veeamxfs="no"
+      veeamxfs="no"
       else
-      $veeamxfs="yes"
+      veeamxfs="yes"
       fi ;;
     "x")  exit                      ;;
      * )  echo "invalid option"     ;;
