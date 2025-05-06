@@ -9,11 +9,13 @@ echo This script will configure a basic Ubuntu server to try and fit the role it
 echo Please use the following menu to set the server parameters. Take a checkpoint before running this. Hit any key to begin ...
 read -rsn1
 # Create folder structure
+echo ========== Creating TAB folder structure ==========
 mkdir /etc/tab
 mkdir /etc/tab/conf
 mkdir /etc/tab/scripts
 mkdir /etc/tab/logs
 # Grab the baseline config file
+echo ========== Get baseline config file ==========
 wget -O /etc/tab/conf/default.conf https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/default.conf
 
 
