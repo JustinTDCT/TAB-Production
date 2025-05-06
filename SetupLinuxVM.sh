@@ -54,8 +54,8 @@ EOF
       else
       veeamxfs="yes"
       fi ;;
-    "z") if [ $veeamxfs == "yes" ]; then
-      fi ;;
+    #"z") if [ $veeamxfs == "yes" ]; then
+    #  fi ;;
     "x")  exit                      ;;
      * )  echo "invalid option"     ;;
     esac
