@@ -19,4 +19,33 @@ echo ========== Get baseline config file ==========
 wget -O /etc/tab/conf/default.conf https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/default.conf
 echo ========== Loading baseline config file ==========
 source /etc/tab/conf/default.conf
+while :
+do
+    clear
+    cat<<EOF
+  VM Setup Script $scriptver
+  =============================
+  a. VeeamXFS Server: $veeamxfs
+  b. Install WebMin: $webmin
+  c. Script set IP of this server: $serverip
+  d. Install Docker-CE and Compose: $docker
+  e. Automate agent download URL: $lturl
+  f. TABADMIN password change: $tapw
+  
+  The below are only needed if this is a VeeamXFS VM
+  n. Veeam user password: $vupw
+  o. NAS IP: $nasip
+  p. iSCSI dev name: $devnm
+  q. Host server name: $host
 
+  x. Abort and quit
+  z. Start setup 
+EOF
+    read -n1 -s menu
+    menu="${menu,,}"
+    case "$menu" in
+    "0")  exit                      ;;
+     * )  echo "invalid option"     ;;
+    esac
+    sleep 1
+done
