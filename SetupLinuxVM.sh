@@ -24,7 +24,7 @@ save_settings () {
       echo "host=\"$host\""
       echo "docker=\"$docker\""
       echo "serverip=\"$serverip\""
-    } >> /etc/tab/tab/default.conf
+    } >> /etc/tab/default.conf
 }
 
 first_run () {
