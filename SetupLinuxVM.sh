@@ -32,8 +32,8 @@ get_script_files () {
   echo ========== Grabbing script files ==========
   echo "- /etc/tab_scripts/SetupVeeam.sh"
   wget -O /etc/tab_scripts/SetupVeeamVM.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/SetupVeeamVM 2> /dev/null
-  echo "- /etc/tab_scripts/SetIP.sh"
-  wget -O /etc/tab_scripts/SetIP.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/setip 2> /dev/null 
+  echo "- /etc/tab_scripts/changeip.sh"
+  wget -O /etc/tab_scripts/changeip.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/ChangeIP.sh 2> /dev/null 
   echo "- /etc/tab_scripts/loginscript.sh"
   wget -O /etc/tab_scripts/loginscript.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/loginscript 2> /dev/null
   echo "- /etc/tab_scripts/DeployUbuntu.sh"
@@ -50,7 +50,7 @@ get_script_files () {
   wget -O /etc/tab/scripts/checkiscsi.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/CheckiSCSI.sh 2> /dev/null
   # make the files executable (8 files)
   chmod +xX /etc/tab/scripts/SetupVeeamVM.sh
-  chmod +xX /etc/tab/scripts/SetIP.sh
+  chmod +xX /etc/tab/scripts/changeip.sh
   chmod +xX /etc/tab/scripts/loginscript.sh
   chmod +xX /etc/tab/scripts/DeployUbuntu.sh
   chmod +xX /etc/tab/scripts/disable-phased-update.sh
