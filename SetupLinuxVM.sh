@@ -148,7 +148,7 @@ EOF
                     if [ $host != "none" ] ; then
                         echo "Veeam system lets go!";
                         state="starting"
-                        
+                        save_settings
                     else
                         echo "ERROR: Host name of parent system not set!";
                     fi
@@ -160,6 +160,8 @@ EOF
             fi
          else
              echo "Not VEEAM";
+             state="starting"
+             save_settings
           fi ;;
      * )  echo "invalid option"     ;;
     esac
