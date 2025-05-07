@@ -41,23 +41,23 @@ get_script_files () {
   echo "- /etc/tab_scripts/disable-phased-update.sh"
   wget -O /etc/tabscripts/disable-phased-update.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/disable-phased-update.sh 2> /dev/null
   echo "- /bin/bouncelt.sh"
-  wget -O /bin/bouncelt.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/bouncelt.sh 2> /dev/null
+  wget -O /bin/bouncelt.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceLT.sh 2> /dev/null
   echo "- /bin/bouncesc.sh"
-  wget -O /bin/bouncesc.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/bouncesc.sh 2> /dev/null
+  wget -O /bin/bouncesc.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceSC.sh 2> /dev/null
   echo "- /bin/nightlyactions.sh"
   wget -O /bin/nightlyactions.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/nightlyactions.sh 2> /dev/null
   echo "- /etc/tab_scripts/checkiscsi.sh"
-  wget -O /etc/tab_scripts/checkiscsi.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/checkiscsi.sh 2> /dev/null
+  wget -O /etc/tab/scripts/checkiscsi.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/CheckiSCSI.sh 2> /dev/null
   # make the files executable (8 files)
-  chmod +xX /etc/tab_scripts/SetupVeeamVM.sh
-  chmod +xX /etc/tab_scripts/SetIP.sh
-  chmod +xX /etc/tab_scripts/loginscript.sh
-  chmod +xX /etc/tab_scripts/DeployUbuntu.sh
-  chmod +xX /etc/tab_scripts/disable-phased-update.sh
+  chmod +xX /etc/tab/scripts/SetupVeeamVM.sh
+  chmod +xX /etc/tab/scripts/SetIP.sh
+  chmod +xX /etc/tab/scripts/loginscript.sh
+  chmod +xX /etc/tab/scripts/DeployUbuntu.sh
+  chmod +xX /etc/tab/scripts/disable-phased-update.sh
   chmod +xX /bin/bouncelt.sh
   chmod +xX /bin/bouncesc.sh
   chmod +xX /bin/nightlyactions.sh
-  chmod +xX /etc/tab_scripts/checkiscsi.sh
+  chmod +xX /etc/tab/scripts/checkiscsi.sh
 }
 
 # this is the main menu where you adjust how this machine will be setup
