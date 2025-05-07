@@ -166,9 +166,11 @@ else
   echo "This is the first run of this script - setting up ...";
   first_run;
   disable_sharding;
-  echo "Baseline setup done, ready to do detailed setup - hit any key to to continue ...";
+  get_script_files;
+  echo "Baseline setup done, ready to do detailed setup - you should now re-run this script from /etc/tab/scripts (I'll exit there for you)! Hit any key to exit ...";
   read -rsn1
-  source /etc/tab/conf/default.conf
+  cd /etc/tab/scripts
+  exit
 fi
 
 # this is the main menu where you adjust how this machine will be setup
