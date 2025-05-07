@@ -47,17 +47,17 @@ get_script_files () {
   echo ========== Grabbing script files ==========
   #echo "- /etc/tab_scripts/SetupVeeam.sh"
   #wget -O /etc/tab_scripts/SetupVeeamVM.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/SetupVeeamVM 2> /dev/null
-  echo "- /etc/tab_scripts/changeip.sh"
-  wget -O /etc/tab_scripts/changeip.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/ChangeIP.sh 2> /dev/null 
-  echo "- /etc/tab_scripts/setuplinuxvm.sh"
-  wget -O /etc/tab_scripts/setuplinuxvm.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/SetupLinuxVM.sh 2> /dev/null
+  echo "- /etc/tab/scripts/changeip.sh"
+  wget -O /etc/tab/scripts/changeip.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/ChangeIP.sh 2> /dev/null 
+  echo "- /etc/tab/scripts/setuplinuxvm.sh"
+  wget -O /etc/tab/scripts/setuplinuxvm.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/SetupLinuxVM.sh 2> /dev/null
   echo "- /bin/bouncelt.sh"
   wget -O /bin/bouncelt.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceLT.sh 2> /dev/null
   echo "- /bin/bouncesc.sh"
   wget -O /bin/bouncesc.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceSC.sh 2> /dev/null
   echo "- /bin/nightlyactions.sh"
   wget -O /bin/nightlyactions.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/NightlyActions.sh 2> /dev/null
-  echo "- /etc/tab_scripts/checkiscsi.sh"
+  echo "- /etc/tab/scripts/checkiscsi.sh"
   wget -O /etc/tab/scripts/checkiscsi.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/CheckiSCSI.sh 2> /dev/null
   # make the files executable (8 files)
   #chmod +xX /etc/tab/scripts/SetupVeeamVM.sh
