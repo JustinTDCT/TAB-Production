@@ -122,7 +122,7 @@ EOF
             fi
          else
              echo "Not VEEAM";
-          if ;;
+          fi ;;
      * )  echo "invalid option"     ;;
     esac
     sleep 1
