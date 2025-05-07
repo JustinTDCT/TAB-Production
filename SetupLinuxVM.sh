@@ -27,6 +27,7 @@ first_run () {
   mkdir /etc/tab/conf
   mkdir /etc/tab/scripts
   mkdir /etc/tab/logs
+  mkdir /tab_temp
   # Grab the baseline config file and load it
   echo ========== Get baseline config file ==========
   wget -O /etc/tab/conf/default.conf https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/default.conf
@@ -74,6 +75,79 @@ get_script_files () {
   chmod +xX /etc/tab/scripts/checkiscsi.sh
 }
 
+setup_cron () {
+  sed '22,$ d' /etc/crontab > /tab_temp/crontab2
+  mv /tab_temp/crontab2 /etc/crontab
+  echo "30 20 * * * root /bin/nightlyactions.sh" >> /etc/crontab
+  echo "10 * * * * root /etc/tab/scripts/checkiscsi.sh" >> /etc/crontab
+  state="setup_cron"
+  save_settings
+}
+
+update_os () {
+  echo ========== Updating Ubuntu ==========
+  apt update
+  apt upgrade -y
+  state="updated"
+  save_settings
+}
+
+install_key_software () {
+  apt install htop unzip bmon default-jre
+  state="install_key"
+  save_settings
+}
+
+install_webmin () {
+  echo ========== Installing WebMin ==========
+  rm -f /usr/share/keyrings/webmin.gpg
+  curl -fsSL https://download.webmin.com/jcameron-key.asc | sudo gpg --dearmor -o /usr/share/keyrings/webmin.gpg
+  repos=$(tail  /etc/apt/sources.list | grep -m 1 "webmin")
+  if [[ "$repos" != "deb [signed-by=/usr/share/keyrings/webmin.gpg] http://download.webmin.com/download/repository sarge contrib" ]]; then
+    echo "Adding WebMin to sources"
+    echo "deb [signed-by=/usr/share/keyrings/webmin.gpg] http://download.webmin.com/download/repository sarge contrib" >> /etc/apt/sources.list
+  else
+    echo "Repo already added, skipping"
+  fi
+  apt update
+  apt install webmin -y
+  webmin="installed"
+  state="webmin_installed"
+  save_settings
+}
+
+install_docker () {
+  echo ========== Installing WebMin ==========
+  apt-get update
+  apt-get install ca-certificates curl
+  install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  chmod a+r /etc/apt/keyrings/docker.asc
+  echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  tee /etc/apt/sources.list.d/docker.list > /dev/null
+  apt-get update
+  apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose
+  docker="installed"
+  state="docker_installed"
+  save_settings  
+}
+
+do_install () {
+  echo ========== Running selected installs ==========
+  update_os
+  setup_cron
+  install_key_software
+  state="updated"
+  save_settings
+  if [ $webmin == "yes" ] ; then
+    install_webmin
+  fi
+  if [ $docker == "yes" ] ; then
+    install_docker
+  fi        
+}
 
 if [ "$EUID" -ne 0 ]
   then echo "WARNING: This needs to be run as SUDO!"
@@ -124,20 +198,26 @@ EOF
     read -n1 -s menu
     menu="${menu,,}"
     case "$menu" in
-    "a") if [ $veeamxfs == "yes" ]; then
-      veeamxfs="no"
-      else
-      veeamxfs="yes"
+    "a") if [ $veeamxfs != "installed" ] ; then
+           if [ $veeamxfs == "yes" ]; then
+             veeamxfs="no"
+           else
+             veeamxfs="yes"
+           fi
       fi ;;
-    "b") if [ $webmin == "yes" ]; then
-      webmin="no"
-      else
-      webmin="yes"
+    "b") if [ $webmin != "installed" ] ; then
+           if [ $webmin == "yes" ]; then
+             webmin="no"
+           else
+             webmin="yes"
+           fi
       fi ;;
-    "d") if [ $docker == "yes" ]; then
-      docker="no"
-      else
-      docker="yes"
+    "d") if [ $docker != "installed" ] ; then
+           if [ $docker == "yes" ]; then
+             docker="no"
+           else
+             docker="yes"
+           fi
       fi ;;
     "e") read -p "new agent URL : " lturl ;;
     "f") read -p "new tabadmin password : " tapw ;;
