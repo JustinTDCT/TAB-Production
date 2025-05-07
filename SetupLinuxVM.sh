@@ -4,7 +4,7 @@
 
 save_settings () {
 {
-      echo "veeamxfs=\"$veamxfs\""
+      echo "veeamxfs=\"$veeamxfs\""
       echo "iscsifail=\"$iscsifail\""
       echo "rebooted=\"$rebooted\""
       echo "scriptver=\"$scriptver\""
