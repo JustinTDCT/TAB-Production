@@ -126,7 +126,7 @@ EOF
     "x")  exit ;;
     "z") if [ $veeamxfs == "yes" ] ; then
             if [ $vupw != "none" ] ; then
-                if [$nasip != "none"] ; then
+                if [ $nasip != "none"] ; then
                     if [ $host != "none"] ; then
                         echo "Veeam system lets go!";
                     else
