@@ -65,12 +65,14 @@ get_script_files () {
 
 if [ -f "/etc/tab/conf/default.conf" ]; then
   echo "This has been run before ... pulling configuration data and re-starting the setup ...";
+  source /etc/tab/conf/default.conf
 else
   echo "This is the first run of this script - setting up ...";
   first_run;
   disable_sharding;
   echo "Baseline setup done, ready to do detailed setup - hit any key to to continue ...";
   read -rsn1
+  source /etc/tab/conf/default.conf
 fi
 
 # this is the main menu where you adjust how this machine will be setup
