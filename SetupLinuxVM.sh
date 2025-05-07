@@ -8,17 +8,20 @@ clear
 echo This script will configure a basic Ubuntu server to try and fit the role it will play within TAB or a client ...
 echo Please use the following menu to set the server parameters. Take a checkpoint before running this. Hit any key to begin ...
 read -rsn1
-# Create folder structure
-echo ========== Creating TAB folder structure ==========
-mkdir /etc/tab
-mkdir /etc/tab/conf
-mkdir /etc/tab/scripts
-mkdir /etc/tab/logs
-# Grab the baseline config file and load it
-echo ========== Get baseline config file ==========
-wget -O /etc/tab/conf/default.conf https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/default.conf
-echo ========== Loading baseline config file ==========
-source /etc/tab/conf/default.conf
+
+first_run () {
+  # Create folder structure
+  echo ========== Creating TAB folder structure ==========
+  mkdir /etc/tab
+  mkdir /etc/tab/conf
+  mkdir /etc/tab/scripts
+  mkdir /etc/tab/logs
+  # Grab the baseline config file and load it
+  echo ========== Get baseline config file ==========
+  wget -O /etc/tab/conf/default.conf https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/default.conf
+  echo ========== Loading baseline config file ==========
+  source /etc/tab/conf/default.conf
+}
 
 disable_sharding () {
   echo ========== Disable APT sharding ==========
@@ -60,6 +63,15 @@ get_script_files () {
   chmod +xX /etc/tab/scripts/checkiscsi.sh
 }
 
+if [ -f "/etc/tab/conf/default.conf" ]; then
+  echo "This has been run before ... pulling configuration data and re-starting the setup ...";
+else
+  echo "This is the first run of this script - setting up ...";
+  first_run;
+  disable_sharding;
+  echo "Baseline setup done, ready to do detailed setup - hit any key to to continue ...";
+  read -rsn1
+fi
 
 # this is the main menu where you adjust how this machine will be setup
 while :
