@@ -9,6 +9,24 @@ echo This script will configure a basic Ubuntu server to try and fit the role it
 echo Please use the following menu to set the server parameters. Take a checkpoint before running this. Hit any key to begin ...
 read -rsn1
 
+save_settings () {
+{
+      echo "veeamxfs=\"$veamxfs\""
+      echo "iscsifail=\"$iscsifail\""
+      echo "rebooted=\"$rebooted\""
+      echo "scriptver=\"$scriptver\""
+      echo "webmin=\"$webmin\""
+      echo "state=\"$state\""
+      echo "vupw=\"$vupw\""
+      echo "tapw=\"$tapw\""
+      echo "nasip=\"$nasip\""
+      echo "lturl=\"$lturl\""
+      echo "host=\"$host\""
+      echo "docker=\"$docker\""
+      echo "serverip=\"$serverip\""
+    } >> /etc/tab/tab/default.conf
+}
+
 first_run () {
   # Create folder structure
   echo ========== Creating TAB folder structure ==========
@@ -129,6 +147,8 @@ EOF
                 if [ $nasip != "none" ] ; then
                     if [ $host != "none" ] ; then
                         echo "Veeam system lets go!";
+                        state="starting"
+                        
                     else
                         echo "ERROR: Host name of parent system not set!";
                     fi
