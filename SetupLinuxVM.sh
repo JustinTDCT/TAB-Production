@@ -103,8 +103,12 @@ EOF
       else
       docker="yes"
       fi ;;
-    #"z") if [ $veeamxfs == "yes" ]; then
-    #  fi ;;
+    "e") read -p "new agent URL : " lturl ;;
+    "f") read -p "new tabadmin password : " tapw ;;
+    "n") read -p "new veeamuser password : " vupw ;;
+    "o") read -p "new NAS IP : " nasip ;;
+    "p") read -p "new device id : " devnm ;;
+    "q") read -p "hv host name : " host ;;
     "x")  exit ;;
     "z") if [ $veeamxfs == "yes" ] ; then
             if [ $vupw != "none" ] ; then
