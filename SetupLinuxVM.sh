@@ -17,6 +17,12 @@ save_settings () {
       echo "host=\"$host\""
       echo "docker=\"$docker\""
       echo "serverip=\"$serverip\""
+      echo "setup_cron=\"$setup_cron\""
+      echo "update_os=\"$update_os\""
+      echo "install_key_software=\"$install_key_software\""
+      echo "install_webmin=\"$install_webmin\""
+      echo "install_docker=\"$install_docker\""
+      echo "set_ip=\"$set_ip\""
     } >> /etc/tab/conf/default.conf
 }
 
@@ -70,12 +76,12 @@ get_script_files () {
 }
 
 setup_cron () {
-  if [ $state != "setup_cron" ] ; then  
+  if [ $setup_cron != "done" ] ; then  
     sed '22,$ d' /etc/crontab > /tab_temp/crontab2
     mv /tab_temp/crontab2 /etc/crontab
     echo "30 20 * * * root /bin/nightlyactions.sh" >> /etc/crontab
     echo "10 * * * * root /etc/tab/scripts/checkiscsi.sh" >> /etc/crontab
-    state="setup_cron"
+    setup_cron="done"
     save_settings
   else
     echo "Config shows cron was already adjusted ..."
@@ -83,11 +89,11 @@ setup_cron () {
 }
 
 update_os () {
-  if [ $state != "updated" ] ; then
+  if [ $update_os != "done" ] ; then
     echo ========== Updating Ubuntu ==========
     apt update
     apt upgrade -y
-    state="updated"
+    update_os="done"
     save_settings
   else
     echo "Config shows updates already run ..."
@@ -95,9 +101,9 @@ update_os () {
 }
 
 install_key_software () {
-  if [ $state != "install_key" ] ; then
+  if [ $install_key_software != "done" ] ; then
     apt install htop unzip bmon default-jre -y
-    state="install_key"
+    install_key_software="done"
     save_settings
   else
     echo "Config shows key programs installed already ..."
@@ -105,7 +111,7 @@ install_key_software () {
 }
 
 install_webmin () {
-  if [ $state != "webmin_installed" ] ; then
+  if [ $install_webmin != "done" ] ; then
     echo ========== Installing WebMin ==========
     rm -f /usr/share/keyrings/webmin.gpg
     curl -fsSL https://download.webmin.com/jcameron-key.asc | sudo gpg --dearmor -o /usr/share/keyrings/webmin.gpg
@@ -119,7 +125,7 @@ install_webmin () {
     apt update
     apt install webmin -y
     webmin="installed"
-    state="webmin_installed"
+    install_webmin="done"
     save_settings
   else
     echo "Config shows WebMin already installed ..."
@@ -127,7 +133,7 @@ install_webmin () {
 }
 
 install_docker () {
-  if [ $state != "docker_installed" ] ; then
+  if [ $install_docker != "done" ] ; then
     echo ========== Installing WebMin ==========
     apt-get update
     apt-get install ca-certificates curl
@@ -141,7 +147,7 @@ install_docker () {
     apt-get update
     apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose
     docker="installed"
-    state="docker_installed"
+    install_docker="done"
     save_settings
   else
     echo "Config shows Docker already installed ..."
@@ -195,7 +201,7 @@ EOF
   read -t10
   # output the IP
   ip address
-  state="ipset"
+  set_ip="done"
   save_settings
 }
 
@@ -301,7 +307,6 @@ EOF
                 if [ $nasip != "none" ] ; then
                     if [ $host != "none" ] ; then
                         echo "Veeam system lets go!";
-                        state="starting"
                         save_settings
                         do_install
                     else
@@ -315,7 +320,6 @@ EOF
             fi
          else
              echo "Not a Veeam system!";
-             state="starting"
              save_settings
              do_install
           fi ;;
