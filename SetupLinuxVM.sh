@@ -1,13 +1,6 @@
 #!/bin/bash
 # check to ensure you are running as SUDO
-if [ "$EUID" -ne 0 ]
-  then echo "WARNING: This needs to be run as SUDO!"
-  exit
-fi
-clear
-echo This script will configure a basic Ubuntu server to try and fit the role it will play within TAB or a client ...
-echo Please use the following menu to set the server parameters. Take a checkpoint before running this. Hit any key to begin ...
-read -rsn1
+
 
 save_settings () {
 {
@@ -24,7 +17,7 @@ save_settings () {
       echo "host=\"$host\""
       echo "docker=\"$docker\""
       echo "serverip=\"$serverip\""
-    } >> /etc/tab/default.conf
+    } >> /etc/tab/conf/default.conf
 }
 
 first_run () {
@@ -81,9 +74,20 @@ get_script_files () {
   chmod +xX /etc/tab/scripts/checkiscsi.sh
 }
 
+
+if [ "$EUID" -ne 0 ]
+  then echo "WARNING: This needs to be run as SUDO!"
+  exit
+fi
+clear
+echo This script will configure a basic Ubuntu server to try and fit the role it will play within TAB or a client ...
+echo Please use the following menu to set the server parameters. Take a checkpoint before running this. Hit any key to begin ...
+read -rsn1
+
 if [ -f "/etc/tab/conf/default.conf" ]; then
-  echo "This has been run before ... pulling configuration data and re-starting the setup ...";
+  echo "This has been run before ... pulling configuration, hit any key to restart setup ...";
   source /etc/tab/conf/default.conf
+  read -rsn1
 else
   echo "This is the first run of this script - setting up ...";
   first_run;
