@@ -60,6 +60,7 @@ get_script_files () {
   chmod +xX /etc/tab/scripts/checkiscsi.sh
 }
 
+
 # this is the main menu where you adjust how this machine will be setup
 while :
 do
@@ -104,7 +105,24 @@ EOF
       fi ;;
     #"z") if [ $veeamxfs == "yes" ]; then
     #  fi ;;
-    "x")  exit                      ;;
+    "x")  exit ;;
+    "z") if [ $veeamxfs == "yes" ] ; then
+            if [ $vupw != "none" ] ; then
+                if [$nasip != "none"] ; then
+                    if [ $host != "none"] ; then
+                        echo Veeam system lets go!
+                    else
+                        echo ERROR: Host name of parent system not set!
+                    fi
+                else
+                    echo ERROR: NAS IP not set!
+                fi
+            else
+                echo ERROR: Veeam user password not set!
+            fi
+         else
+             echo Not VEEAM
+          if ;;
      * )  echo "invalid option"     ;;
     esac
     sleep 1
