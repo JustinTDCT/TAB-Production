@@ -20,7 +20,45 @@ wget -O /etc/tab/conf/default.conf https://raw.githubusercontent.com/JustinTDCT/
 echo ========== Loading baseline config file ==========
 source /etc/tab/conf/default.conf
 
+disable_sharding () {
+  echo ========== Disable APT sharding ==========
+  sudo cat > /etc/apt/apt.conf.d/99-disable-phasing <<EOF
+  Update-Manager::Always-Include-Phased-Updates true;
+  APT::Get::Always-Include-Phased-Updates true;
+EOF
+}
 
+get_script_files () {
+  echo ========== Grabbing script files ==========
+  echo "- /etc/tab_scripts/SetupVeeam.sh"
+  wget -O /etc/tab_scripts/SetupVeeamVM.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/SetupVeeamVM 2> /dev/null
+  echo "- /etc/tab_scripts/SetIP.sh"
+  wget -O /etc/tab_scripts/SetIP.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/setip 2> /dev/null 
+  echo "- /etc/tab_scripts/loginscript.sh"
+  wget -O /etc/tab_scripts/loginscript.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/loginscript 2> /dev/null
+  echo "- /etc/tab_scripts/DeployUbuntu.sh"
+  wget -O /etc/tab_scripts/DeployUbuntu.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/DeployUbuntu.sh 2> /dev/null
+  echo "- /etc/tab_scripts/disable-phased-update.sh"
+  wget -O /etc/tabscripts/disable-phased-update.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/disable-phased-update.sh 2> /dev/null
+  echo "- /bin/bouncelt.sh"
+  wget -O /bin/bouncelt.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/bouncelt.sh 2> /dev/null
+  echo "- /bin/bouncesc.sh"
+  wget -O /bin/bouncesc.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/bouncesc.sh 2> /dev/null
+  echo "- /bin/nightlyactions.sh"
+  wget -O /bin/nightlyactions.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/nightlyactions.sh 2> /dev/null
+  echo "- /etc/tab_scripts/checkiscsi.sh"
+  wget -O /etc/tab_scripts/checkiscsi.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/checkiscsi.sh 2> /dev/null
+  # make the files executable (8 files)
+  chmod +xX /etc/tab_scripts/SetupVeeamVM.sh
+  chmod +xX /etc/tab_scripts/SetIP.sh
+  chmod +xX /etc/tab_scripts/loginscript.sh
+  chmod +xX /etc/tab_scripts/DeployUbuntu.sh
+  chmod +xX /etc/tab_scripts/disable-phased-update.sh
+  chmod +xX /bin/bouncelt.sh
+  chmod +xX /bin/bouncesc.sh
+  chmod +xX /bin/nightlyactions.sh
+  chmod +xX /etc/tab_scripts/checkiscsi.sh
+}
 
 # this is the main menu where you adjust how this machine will be setup
 while :
