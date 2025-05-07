@@ -110,18 +110,18 @@ EOF
             if [ $vupw != "none" ] ; then
                 if [$nasip != "none"] ; then
                     if [ $host != "none"] ; then
-                        echo Veeam system lets go!
+                        echo "Veeam system lets go!";
                     else
-                        echo ERROR: Host name of parent system not set!
+                        echo "ERROR: Host name of parent system not set!";
                     fi
                 else
-                    echo ERROR: NAS IP not set!
+                    echo "ERROR: NAS IP not set!";
                 fi
             else
-                echo ERROR: Veeam user password not set!
+                echo "ERROR: Veeam user password not set!";
             fi
          else
-             echo Not VEEAM
+             echo "Not VEEAM";
           if ;;
      * )  echo "invalid option"     ;;
     esac
