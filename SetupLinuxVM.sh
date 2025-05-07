@@ -233,6 +233,7 @@ EOF
                         echo "Veeam system lets go!";
                         state="starting"
                         save_settings
+                        do_install
                     else
                         echo "ERROR: Host name of parent system not set!";
                     fi
@@ -243,9 +244,10 @@ EOF
                 echo "ERROR: Veeam user password not set!";
             fi
          else
-             echo "Not VEEAM";
+             echo "Not a Veeam system!";
              state="starting"
              save_settings
+             do_install
           fi ;;
      * )  echo "invalid option"     ;;
     esac
