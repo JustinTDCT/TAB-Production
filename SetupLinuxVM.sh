@@ -265,6 +265,7 @@ else
   exit
 fi
 
+
 # this is the main menu where you adjust how this machine will be setup
 while :
 do
@@ -308,6 +309,11 @@ EOF
              webmin="yes"
            fi
       fi ;;
+    "c") read -p "new device id : " serverip
+          if [[ $serverip !~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "You did not enter an IP! hit any key ...."
+            read -rsn1
+          fi ;;
     "d") if [ $docker != "installed" ] ; then
            if [ $docker == "yes" ]; then
              docker="no"
