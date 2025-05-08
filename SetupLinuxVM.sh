@@ -1,28 +1,25 @@
 #!/bin/bash
 # check to ensure you are running as SUDO
-
+confini="/etc/tab/conf/default.ini"
 
 save_settings () {
-{
-      echo "veeamxfs=\"$veeamxfs\""
-      echo "iscsifail=\"$iscsifail\""
-      echo "rebooted=\"$rebooted\""
-      echo "scriptver=\"$scriptver\""
-      echo "webmin=\"$webmin\""
-      echo "state=\"$state\""
-      echo "vupw=\"$vupw\""
-      echo "tapw=\"$tapw\""
-      echo "nasip=\"$nasip\""
-      echo "lturl=\"$lturl\""
-      echo "host=\"$host\""
-      echo "docker=\"$docker\""
-      echo "serverip=\"$serverip\""
-      echo "setup_cron=\"$setup_cron\""
-      echo "update_os=\"$update_os\""
-      echo "install_webmin=\"$install_webmin\""
-      echo "install_docker=\"$install_docker\""
-      echo "set_ip=\"$set_ip\""
-    } >> /etc/tab/conf/default.conf
+  crudini --set default.ini var veeamxfs \"$veeamxfs\"
+  crudini --set default.ini var iscsifail\ \"$iscsifail\"
+  crudini --set default.ini var rebooted \"$rebooted\"
+  crudini --set default.ini var scriptver \"$scriptver\"
+  crudini --set default.ini var webmin \"$webmin\"
+  crudini --set default.ini var vupw \"$vupw\"
+  crudini --set default.ini var tapw \"$tapw\"
+  crudini --set default.ini var nasip \"$nasip\"
+  crudini --set default.ini var lturl \"$lturl\"
+  crudini --set default.ini var host \"$host\"
+  crudini --set default.ini var docker \"$docker\"
+  crudini --set default.ini var serverip \"$serverip\"
+  crudini --set default.ini stage update_os \"$update_os\"
+  crudini --set default.ini stage setup_cron\ \"$setup_cron\"
+  crudini --set default.ini stage install_webmin \"$install_webmin\"
+  crudini --set default.ini stage install_docker \"$install_docker\"
+  crudini --set default.ini stage set_ip \"set_ip\"
 }
 
 install_key_software () {
