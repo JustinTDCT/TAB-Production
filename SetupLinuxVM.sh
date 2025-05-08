@@ -227,7 +227,7 @@ echo Please use the following menu to set the server parameters. Take a checkpoi
 echo
 read -rsn1
 
-if [ -f "/etc/tab/conf/default.conf" ]; then
+if [ -f "/etc/tab/conf/default.ini" ]; then
   echo "This has been run before ... pulling configuration, hit any key to restart setup ...";
   source /etc/tab/conf/default.conf
   read -rsn1
