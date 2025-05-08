@@ -211,12 +211,18 @@ do_install () {
   save_settings
   if [ $webmin == "yes" ] ; then
     install_webmin
+  else
+    echo "Skipping WebMin install as defined in config ..."
   fi
   if [ $docker == "yes" ] ; then
     install_docker
+  else
+    echo "Skipping Docker install as defined in config ..."
   fi  
   if [ $serverip != "none" ] ; then
     set_ip
+  else
+    echo "Skipping IP setup as defined in config ..."
   fi
   echo
   echo "Hit any key to continue back to the menu ... "
