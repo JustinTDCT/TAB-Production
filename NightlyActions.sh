@@ -5,52 +5,30 @@ echo "=============================================================" >> /var/log
 echo "=============================================================" >> /var/log/nightlyactions.log
 echo "$(date)" >> /var/log/nightlyactions.log
 echo "=============================================================" >> /var/log/nightlyactions.log
-# clear out old files
-echo "Removing old files ..." >> /var/log/nightlyactions.log
-rm -r /etc/tab  2> /dev/null
-rm -r /etc/tab_scripts 2> /dev/null
-rm /home/tabadmin/SetupVeeamVM.sh 2> /dev/null
-rm /home/tabadmin/SetIP.sh 2> /dev/null
-rm /home/tabadmin/loginscript.sh 2> /dev/null
-rm /bin/bouncelt.sh 2> /dev/null
-rm /bin/bouncesc.sh 2> /dev/null
-rm /bin/bouncescreencon.sh 2> /dev/null 
-rm /bin/nightlyactions.sh 2> /dev/null
-# make the tab folder
-mkdir /etc/tab_scripts
-echo "2.01.02" >> /etc/tab_scripts/ver.txt
-mkdir /tab_temp
-chmod +777 /tab_temp
 # grab new files
 echo "Grab new files ..." >> /var/log/nightlyactions.log
-wget -O /etc/tab_scripts/SetupVeeamVM.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/SetupVeeamVM 2> /dev/null
-wget -O /etc/tab_scripts/SetIP.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/setip 2> /dev/null
-wget -O /etc/tab_scripts/loginscript.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/loginscript 2> /dev/null
-wget -O /etc/tab_scripts/DeployUbuntu.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/DeployUbuntu.sh 2> /dev/null
-wget -O /etc/tab_scripts/disable-phased-update.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/disable-phased-update.sh 2> /dev/null
-wget -O /bin/bouncelt.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/bouncelt.sh 2> /dev/null
-wget -O /bin/bouncesc.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/bouncesc.sh 2> /dev/null
-wget -O /bin/nightlyactions.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/nightlyactions.sh 2> /dev/null
-wget -O /etc/tab_scripts/checkiscsi.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/checkiscsi.sh 2> /dev/null
-# make them executable
-chmod +xX /etc/tab_scripts/SetupVeeamVM.sh
-chmod +xX /etc/tab_scripts/SetIP.sh
-chmod +xX /etc/tab_scripts/loginscript.sh
-chmod +xX /etc/tab_scripts/DeployUbuntu.sh
-chmod +xX /etc/tab_scripts/disable-phased-update.sh
+#echo "- /etc/tab_scripts/SetupVeeam.sh"
+#wget -O /etc/tab_scripts/SetupVeeamVM.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/SetupVeeamVM 2> /dev/null
+wget -O /etc/tab/scripts/changeip.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/ChangeIP.sh 2> /dev/null 
+wget -O /etc/tab/scripts/setuplinuxvm.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/SetupLinuxVM.sh 2> /dev/null
+wget -O /bin/bouncelt.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceLT.sh 2> /dev/null
+wget -O /bin/bouncesc.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceSC.sh 2> /dev/null
+wget -O /bin/nightlyactions.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/NightlyActions.sh 2> /dev/null
+wget -O /etc/tab/scripts/checkiscsi.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/CheckiSCSI.sh 2> /dev/null
+# make the files executable (8 files)
+#chmod +xX /etc/tab/scripts/SetupVeeamVM.sh
+chmod +xX /etc/tab/scripts/changeip.sh
+chmod +xX /etc/tab/scripts/setuplinuxvm.sh
 chmod +xX /bin/bouncelt.sh
 chmod +xX /bin/bouncesc.sh
 chmod +xX /bin/nightlyactions.sh
-chmod +xX /etc/tab_scripts/checkiscsi.sh
+chmod +xX /etc/tab/scripts/checkiscsi.sh
 # update cron
 echo "Updating cron ..." >> /var/log/nightlyactions.log
-cat /etc/crontab >> /var/log/nightlyactions.log
 sed '22,$ d' /etc/crontab > /tab_temp/crontab2
 mv /tab_temp/crontab2 /etc/crontab
 echo "30 20 * * * root /bin/nightlyactions.sh" >> /etc/crontab
-echo "10 * * * * root /etc/tab_scripts/checkiscsi.sh" >> /etc/crontab
-cat /etc/crontab >> /var/log/nightlyactions.log
-echo "Grab new files ..." >> /var/log/nightlyactions.log
+echo "10 * * * * root /etc/tab/scripts/checkiscsi.sh" >> /etc/crontab
 # kill LT
 echo "Restart LT (Check, kill, re-check) ..." >> /var/log/nightlyactions.log
 service ltechagent status >> /var/log/nightlyactions.log
