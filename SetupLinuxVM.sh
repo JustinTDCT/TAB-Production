@@ -229,7 +229,7 @@ read -rsn1
 
 if [ -f "/etc/tab/conf/default.ini" ]; then
   echo "This has been run before ... pulling configuration, hit any key to restart setup ...";
-  source /etc/tab/conf/default.conf
+  source /etc/tab/conf/default.ini
   read -rsn1
 else
   echo "This is the first run of this script - setting up ...";
