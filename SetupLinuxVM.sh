@@ -212,6 +212,7 @@ do_install () {
   if [ $serverip != "none" ] ; then
     set_ip
   fi
+  echo
   echo "Hit any key to continue back to the menu ... "
   read -rsn1
 }
@@ -223,6 +224,7 @@ fi
 clear
 echo This script will configure a basic Ubuntu server to try and fit the role it will play within TAB or a client ...
 echo Please use the following menu to set the server parameters. Take a checkpoint before running this. Hit any key to begin ...
+echo
 read -rsn1
 
 if [ -f "/etc/tab/conf/default.conf" ]; then
@@ -234,7 +236,7 @@ else
   first_run;
   disable_sharding;
   get_script_files;
-  echo "Baseline setup done, ready to do detailed setup - you should now re-run this script from /etc/tab/scripts (I'll exit there for you)! Hit any key to exit ...";
+  echo "Baseline setup done, ready to do detailed setup - we will now re-run this script from /etc/tab/scripts; hit any key to continue ...";
   read -rsn1
   cd /etc/tab/scripts
   exit
