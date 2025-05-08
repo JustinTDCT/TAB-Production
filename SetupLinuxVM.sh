@@ -310,7 +310,9 @@ EOF
            fi
       fi ;;
     "c") read -p "new device id : " serverip
-          if [[ $serverip !~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ $serverip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo
+          else
             echo "You did not enter an IP! hit any key ...."
             read -rsn1
           fi ;;
