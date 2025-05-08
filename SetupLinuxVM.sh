@@ -314,6 +314,7 @@ EOF
             echo
           else
             echo "You did not enter an IP! hit any key ...."
+            serverip="none"
             read -rsn1
           fi ;;
     "d") if [ $docker != "installed" ] ; then
