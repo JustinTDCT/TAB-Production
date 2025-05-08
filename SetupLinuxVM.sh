@@ -19,11 +19,14 @@ save_settings () {
       echo "serverip=\"$serverip\""
       echo "setup_cron=\"$setup_cron\""
       echo "update_os=\"$update_os\""
-      echo "install_key_software=\"$install_key_software\""
       echo "install_webmin=\"$install_webmin\""
       echo "install_docker=\"$install_docker\""
       echo "set_ip=\"$set_ip\""
     } >> /etc/tab/conf/default.conf
+}
+
+install_key_software () {
+    apt install htop unzip bmon default-jre crudini-y
 }
 
 first_run () {
@@ -34,6 +37,7 @@ first_run () {
   mkdir /etc/tab/scripts
   mkdir /etc/tab/logs
   mkdir /tab_temp
+  install_key_software
   # Grab the baseline config file and load it
   echo ========== Get baseline config file ==========
   wget -O /etc/tab/conf/default.conf https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/default.conf
@@ -100,15 +104,6 @@ update_os () {
   fi
 }
 
-install_key_software () {
-  if [ $install_key_software != "done" ] ; then
-    apt install htop unzip bmon default-jre -y
-    install_key_software="done"
-    save_settings
-  else
-    echo "Config shows key programs installed already ..."
-  fi
-}
 
 install_webmin () {
   if [ $install_webmin != "done" ] ; then
@@ -209,7 +204,6 @@ do_install () {
   echo ========== Running selected installs ==========
   update_os
   setup_cron
-  install_key_software
   state="updated"
   save_settings
   if [ $webmin == "yes" ] ; then
