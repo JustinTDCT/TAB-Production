@@ -240,6 +240,19 @@ do_install () {
   read -rsn1
 }
 
+function checkCidrFormat {
+  local ipCidr="${1}"
+  local validIpCidr
+  validIpCidr='(^([1-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\/([1-9]|[1-2][0-9]|[3][0-2]))$'
+  if [[ $ipCidr =~ ^$validIpCidr ]]; then
+    echo "valid format"
+    return 0
+  else
+    echo "not valid format"
+    return 1
+  fi
+}
+
 if [ "$EUID" -ne 0 ]
   then echo "WARNING: This needs to be run as SUDO!"
   exit
@@ -309,14 +322,14 @@ EOF
              webmin="yes"
            fi
       fi ;;
-    "c") read -p "new device id : " serverip
-          if [[ $serverip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo
-          else
-            echo "You did not enter an IP! hit any key ...."
-            serverip="none"
-            read -rsn1
-          fi ;;
+    "c") echo "Enter the IP in CIDR format. IE, 192.168.1.123/24"
+            while true;
+              do
+              read -rp "ip serverip (eg. 172.16.16.32/27): " cidr
+              if checkCidrFormat "${serverip}"; then
+              echo "Saving"
+              fi
+            done ;;
     "d") if [ $docker != "installed" ] ; then
            if [ $docker == "yes" ]; then
              docker="no"
