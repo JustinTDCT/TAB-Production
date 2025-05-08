@@ -176,11 +176,9 @@ set_ip () {
     nic=`ip address | awk 'NR==7{print $2}'`
     echo "Working with" $nic
     # Ask for input on network configuration
-    echo "Intentional delay here for 20 seconds ... the login likes to blank the line you're on ... if this still happens you should be entering 3 things:"
-    echo "VM IP in CIDR form (IE 192.168.1.100/24), the gateway, then a comma seperated DNS IP list"
-    read -p "Enter the static IP of the server in CIDR notation: " staticip 
+    echo "Using $serverip as the IP of this server ..."
     read -p "Enter the IP of your gateway: " gatewayip
-    read -p "Enter the IP of preferred nameservers (seperated by a coma if more than one): " nameserversip
+    read -p "Enter the IP of preferred nameservers (seperated by a comma if more than one): " nameserversip
     echo
     echo "Ready to apply new IP - NOTE: If you are SSH'd in your connection will drop and you will need to run the script again (wait about 2m), hit any key to begin ..."
     read -s
@@ -190,7 +188,7 @@ network:
   ethernets:
     $nic
       addresses:
-      - $staticip
+      - $serverip
       nameservers:
         addresses: [$nameserversip]
       routes:
