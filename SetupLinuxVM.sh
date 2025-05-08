@@ -19,7 +19,9 @@ save_settings () {
   crudini --set /etc/tab/conf/default.ini \"\" setup_cron\ \"$setup_cron\"
   crudini --set /etc/tab/conf/default.ini \"\" install_webmin \"$install_webmin\"
   crudini --set /etc/tab/conf/default.ini \"\" install_docker \"$install_docker\"
-  crudini --set /etc/tab/conf/default.ini \"\" set_ip \"set_ip\"
+  crudini --set /etc/tab/conf/default.ini \"\" set_ip \"$set_ip\"
+  crudini --set /etc/tab/conf/default.ini \"\" uuid \"$uuid\"
+  crudini --set /etc/tab/conf/default.ini \"\" initiator \"$initiator\"
 }
 
 
