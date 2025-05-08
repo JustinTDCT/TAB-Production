@@ -23,7 +23,7 @@ save_settings () {
 }
 
 install_key_software () {
-    apt install htop unzip bmon default-jre crudini -y
+    apt install htop unzip bmon default-jre crudini ncdu -y
 }
 
 first_run () {
