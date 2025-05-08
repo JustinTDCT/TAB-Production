@@ -1,6 +1,7 @@
 #!/bin/bash
 # check to ensure you are running as SUDO
 confini="/etc/tab/conf/default.ini"
+IPOK="no"
 
 save_settings () {
   crudini --set /etc/tab/conf/default.ini \"\" veeamxfs \"$veeamxfs\"
@@ -241,14 +242,16 @@ do_install () {
 }
 
 function checkCidrFormat {
+  IPOK="no"
   local ipCidr="${1}"
   local validIpCidr
   validIpCidr='(^([1-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\/([1-9]|[1-2][0-9]|[3][0-2]))$'
   if [[ $ipCidr =~ ^$validIpCidr ]]; then
-    echo "valid format"
+    echo "Format valid"
+    IPOK="yes"
     return 0
   else
-    echo "not valid format"
+    echo "Not a CIDR format"
     return 1
   fi
 }
@@ -323,13 +326,14 @@ EOF
            fi
       fi ;;
     "c") echo "Enter the IP in CIDR format. IE, 192.168.1.123/24"
-            while true;
+            while [[ $IPOK == "no" ]] ;
               do
-              read -rp "ip serverip (eg. 172.16.16.32/27): " cidr
+              read -rp "new IP: " serverip
               if checkCidrFormat "${serverip}"; then
-              echo "Saving"
+              echo "Moving on..."
               fi
-            done ;;
+            done 
+            IPOK="no" ;;
     "d") if [ $docker != "installed" ] ; then
            if [ $docker == "yes" ]; then
              docker="no"
