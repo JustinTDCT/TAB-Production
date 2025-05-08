@@ -265,6 +265,8 @@ do
 
   x. Abort and quit
   z. Start setup 
+
+  NOTE - Any user input value besides a default value will cause the script to attempt that portion!
   
 EOF
     read -n1 -s menu
@@ -306,13 +308,16 @@ EOF
                         save_settings
                         do_install
                     else
-                        echo "ERROR: Host name of parent system not set!";
+                        echo "ERROR: Host name of parent system not set! Hit any key to continue ...";
+                        read -rsn1
                     fi
                 else
-                    echo "ERROR: NAS IP not set!";
+                    echo "ERROR: NAS IP not set! Hit any key to continue ...";
+                    read -rsn1
                 fi
             else
-                echo "ERROR: Veeam user password not set!";
+                echo "ERROR: Veeam user password not set! Hit any key to continue ...";
+                read -rsn1
             fi
          else
              echo "Not a Veeam system!";
