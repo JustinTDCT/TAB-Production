@@ -3,24 +3,25 @@
 confini="/etc/tab/conf/default.ini"
 
 save_settings () {
-  crudini --set default.ini \"\" veeamxfs \"$veeamxfs\"
-  crudini --set default.ini \"\" iscsifail\ \"$iscsifail\"
-  crudini --set default.ini \"\" rebooted \"$rebooted\"
-  crudini --set default.ini \"\" scriptver \"$scriptver\"
-  crudini --set default.ini \"\" webmin \"$webmin\"
-  crudini --set default.ini \"\" vupw \"$vupw\"
-  crudini --set default.ini \"\" tapw \"$tapw\"
-  crudini --set default.ini \"\" nasip \"$nasip\"
-  crudini --set default.ini \"\" lturl \"$lturl\"
-  crudini --set default.ini \"\" host \"$host\"
-  crudini --set default.ini \"\" docker \"$docker\"
-  crudini --set default.ini \"\" serverip \"$serverip\"
-  crudini --set default.ini \"\" update_os \"$update_os\"
-  crudini --set default.ini \"\" setup_cron\ \"$setup_cron\"
-  crudini --set default.ini \"\" install_webmin \"$install_webmin\"
-  crudini --set default.ini \"\" install_docker \"$install_docker\"
-  crudini --set default.ini \"\" set_ip \"set_ip\"
+  crudini --set /etc/tab/conf/default.ini \"\" veeamxfs \"$veeamxfs\"
+  crudini --set /etc/tab/conf/default.ini \"\" iscsifail\ \"$iscsifail\"
+  crudini --set /etc/tab/conf/default.ini \"\" rebooted \"$rebooted\"
+  crudini --set /etc/tab/conf/default.ini \"\" scriptver \"$scriptver\"
+  crudini --set /etc/tab/conf/default.ini \"\" webmin \"$webmin\"
+  crudini --set /etc/tab/conf/default.ini \"\" vupw \"$vupw\"
+  crudini --set /etc/tab/conf/default.ini \"\" tapw \"$tapw\"
+  crudini --set /etc/tab/conf/default.ini \"\" nasip \"$nasip\"
+  crudini --set /etc/tab/conf/default.ini \"\" lturl \"$lturl\"
+  crudini --set /etc/tab/conf/default.ini \"\" host \"$host\"
+  crudini --set /etc/tab/conf/default.ini \"\" docker \"$docker\"
+  crudini --set /etc/tab/conf/default.ini \"\" serverip \"$serverip\"
+  crudini --set /etc/tab/conf/default.ini \"\" update_os \"$update_os\"
+  crudini --set /etc/tab/conf/default.ini \"\" setup_cron\ \"$setup_cron\"
+  crudini --set /etc/tab/conf/default.ini \"\" install_webmin \"$install_webmin\"
+  crudini --set /etc/tab/conf/default.ini \"\" install_docker \"$install_docker\"
+  crudini --set /etc/tab/conf/default.ini \"\" set_ip \"set_ip\"
 }
+
 
 install_key_software () {
     apt install htop unzip bmon default-jre crudini ncdu -y
