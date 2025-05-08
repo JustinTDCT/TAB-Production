@@ -37,9 +37,9 @@ first_run () {
   install_key_software
   # Grab the baseline config file and load it
   echo ========== Get baseline config file ==========
-  wget -O /etc/tab/conf/default.conf https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/default.conf
+  wget -O /etc/tab/conf/default.ini https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/default.ini
   echo ========== Loading baseline config file ==========
-  source /etc/tab/conf/default.conf
+  source /etc/tab/conf/default.ini
 }
 
 disable_sharding () {
@@ -212,6 +212,8 @@ do_install () {
   if [ $serverip != "none" ] ; then
     set_ip
   fi
+  echo "Hit any key to continue back to the menu ... "
+  read -rsn1
 }
 
 if [ "$EUID" -ne 0 ]
