@@ -3,34 +3,38 @@
 confini="/etc/tab/conf/default.ini"
 IPOK="no"
 
+get_settings () {
+  source $confini
+}
+
 save_settings () {
-  crudini --set /etc/tab/conf/default.ini \"\" veeamxfs \"$veeamxfs\"
-  crudini --set /etc/tab/conf/default.ini \"\" iscsifail\ \"$iscsifail\"
-  crudini --set /etc/tab/conf/default.ini \"\" rebooted \"$rebooted\"
-  crudini --set /etc/tab/conf/default.ini \"\" scriptver \"$scriptver\"
-  crudini --set /etc/tab/conf/default.ini \"\" webmin \"$webmin\"
-  crudini --set /etc/tab/conf/default.ini \"\" vupw \"$vupw\"
-  crudini --set /etc/tab/conf/default.ini \"\" tapw \"$tapw\"
-  crudini --set /etc/tab/conf/default.ini \"\" nasip \"$nasip\"
-  crudini --set /etc/tab/conf/default.ini \"\" lturl \"$lturl\"
-  crudini --set /etc/tab/conf/default.ini \"\" host \"$host\"
-  crudini --set /etc/tab/conf/default.ini \"\" docker \"$docker\"
-  crudini --set /etc/tab/conf/default.ini \"\" serverip \"$serverip\"
-  crudini --set /etc/tab/conf/default.ini \"\" update_os \"$update_os\"
-  crudini --set /etc/tab/conf/default.ini \"\" setup_cron\ \"$setup_cron\"
-  crudini --set /etc/tab/conf/default.ini \"\" install_webmin \"$install_webmin\"
-  crudini --set /etc/tab/conf/default.ini \"\" install_docker \"$install_docker\"
-  crudini --set /etc/tab/conf/default.ini \"\" set_ip \"$set_ip\"
-  crudini --set /etc/tab/conf/default.ini \"\" uuid \"$uuid\"
-  crudini --set /etc/tab/conf/default.ini \"\" initiator \"$initiator\"
-  crudini --set /etc/tab/conf/default.ini \"\" iscsi_conf \"$iscsi_conf\"
-  crudini --set /etc/tab/conf/default.ini \"\" set_uuid \"$set_uuid\"
-  crudini --set /etc/tab/conf/default.ini \"\" veeam_user \"$veeam_user\"
-  crudini --set /etc/tab/conf/default.ini \"\" veeam_perms \"$veeam_perms\"
-  crudini --set /etc/tab/conf/default.ini \"\" lt_installed \"$lt_installed\"
-  crudini --set /etc/tab/conf/default.ini \"\" fstab_updated \"$fstab_updated\"
-  crudini --set /etc/tab/conf/default.ini \"\" iscsi_edited \"$iscsi_edited\"
-  crudini --set /etc/tab/conf/default.ini \"\" partitioned \"$partitioned\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" veeamxfs \"$veeamxfs\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" iscsifail \"$iscsifail\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" rebooted \"$rebooted\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" scriptver \"$scriptver\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" webmin \"$webmin\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" vupw \"$vupw\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" tapw \"$tapw\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" nasip \"$nasip\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" lturl \"$lturl\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" host \"$host\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" docker \"$docker\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" serverip \"$serverip\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" update_os \"$update_os\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" setup_cron \"$setup_cron\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" install_webmin \"$install_webmin\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" install_docker \"$install_docker\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" set_ip \"$set_ip\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" uuid \"$uuid\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" initiator \"$initiator\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" iscsi_conf \"$iscsi_conf\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" set_uuid \"$set_uuid\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" veeam_user \"$veeam_user\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" veeam_perms \"$veeam_perms\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" lt_installed \"$lt_installed\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" fstab_updated \"$fstab_updated\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" iscsi_edited \"$iscsi_edited\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" partitioned \"$partitioned\"
 }
 
 
@@ -52,7 +56,7 @@ first_run () {
   echo ========== Get baseline config file ==========
   wget -O /etc/tab/conf/default.ini https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/default.ini
   echo ========== Loading baseline config file ==========
-  source /etc/tab/conf/default.ini
+  get_settings
 }
 
 disable_sharding () {
@@ -159,12 +163,51 @@ install_docker () {
   fi
 }
 
+install_automate () {
+  if [ $lt_installed != "done" ] ; then
+    echo ========== Installing Automate ==========
+    # download the LT agent
+    cd /etc/tab
+    wget -O agent.zip $lturl
+    # make sure the command worked and bail if it didn't
+    if [ $? != 0 ]; then
+      echo "Getting the LT agent failed, gonna quit.";
+      return
+    fi
+    # unzip the agent
+    unzip agent.zip
+    # make sure the command worked and bail if it didn't
+    if [ $? != 0 ]; then
+      echo "Unzipping the agent failed, gonna quit.";
+      return
+    fi
+    cd LTechAgent/
+    # set the installer script as executable then run it
+    chmod +x install.sh
+    sudo ./install.sh
+    echo
+    echo "Checking service status to see if it is running ..."
+    echo
+    systemctl status ltechagent | grep active
+    if [ $? != 0 ] ; then
+      echo "Possible failure, cannot fin d the service running; leaving this uninstalled pending a manual review ..."
+    else 
+      echo "Install done, you can verify in the thick client then press any key to continue ..."
+      read -s
+      lt_installed="done"
+      save_settings
+    fi  
+  else
+    echo "Config file shows Automate has already been installed ..."
+  fi
+}
+
 set_ip () {
   if [ $set_ip == "yes" ] ; then
     echo
     echo "Creating a backup of the current profile ..."
     # Creates a backup
-    find -type f | xargs -I {} mv {} {}.bk_`date +%Y%m%d%H%M`
+    find /etc/netplan -type f | xargs -I {} mv {} {}.bk_`date +%Y%m%d%H%M`
     # Changes dhcp from 'yes' to 'no'
     echo "Disabling DHCP"
     sed -i "s/dhcp4: yes/dhcp4: no/g" /etc/netplan/00-installer-config.yaml
@@ -207,32 +250,69 @@ EOF
     ip address
     set_ip="done"
     save_settings
-  else
-    echo
+  else 
     echo "Config shows the IP was already set ..."
+  fi
+}
+
+reset_tabadmin_pw () {
+  if [ $tabadmin_pw != "done" ] ; then
+    echo "PW provided (so you can cut/paste): $tapw   --- note: once saved it will be purged from the config file"
+    passwd tabadmin
+    if [ $? != 0 ]; then
+      echo "Password change ended in error; not saving this stage as done";
+    else
+      echo "Password changed"
+      tapw="set"
+      tabadmin_pw="done"    
+      save_settings  
+    fi
+  else
+    echo "Config file indicates this was already set using the script, please edit the config file or use \"passwd tabadmin\" to manually change it from CLI."
   fi
 }
 
 do_install () {
   echo ========== Running selected installs ==========
   update_os
-  setup_cron
-  state="updated"
   save_settings
+  setup_cron
   if [ $webmin == "yes" ] ; then
     install_webmin
   else
-    echo "Skipping WebMin install as defined in config ..."
+    if [ $webmin == "installed" ] ; then
+      echo "WebMin already installed ..."
+    else
+      echo "Skipping WebMin install as defined in config ..."
+    fi
   fi
+  save_settings
   if [ $docker == "yes" ] ; then
     install_docker
   else
-    echo "Skipping Docker install as defined in config ..."
+    if [ $docker == "installed" ] ; then
+      echo "Docker already installed ..."
+    else
+      echo "Skipping Docker install as defined in config ..."
+    fi
   fi  
+  save_settings
   if [ $serverip != "none" ] ; then
     set_ip
   else
     echo "Skipping IP setup as defined in config ..."
+  fi
+  save_settings
+  if [ $tapw == "set" ] ; then
+    echo "Skipping tabadmin password as defined in config ..."
+  else
+    reset_tabadmin_pw
+  fi
+  save_settings
+  if [ $lturl != "none" ] ; then
+    install_automate
+  else
+    echo "Skipping Automate install as no URL was defined ..."
   fi
   echo
   echo "Hit any key to continue back to the menu ... "
@@ -266,7 +346,7 @@ read -rsn1
 
 if [ -f "/etc/tab/conf/default.ini" ]; then
   echo "This has been run before ... pulling configuration, hit any key to restart setup ...";
-  source /etc/tab/conf/default.ini
+  get_settings
   read -rsn1
 else
   echo "This is the first run of this script - setting up ...";
@@ -339,13 +419,18 @@ EOF
              docker="yes"
            fi
       fi ;;
-    "e") read -p "new agent URL : " lturl ;;
-    "f") read -p "new tabadmin password : " tapw ;;
-    "n") read -p "new veeamuser password : " vupw ;;
-    "o") read -p "new NAS IP : " nasip ;;
-    "p") read -p "new device id : " devnm ;;
-    "q") read -p "hv host name : " host ;;
-    "x")  exit ;;
+    "e") read -p "new agent URL: " lturl ;;
+    "f") read -p "new tabadmin password: " tapw ;;
+    "n") read -p "new veeamuser password: " vupw ;;
+    "o") read -p "new NAS IP: " nasip ;;
+    "p") read -p "new device id: " devnm ;;
+    "q") read -p "hv host name: " host ;;
+    "x") read -p "Save your config? Y/n " -n1 -s saveme
+            if [ $saveme == "y" ] ; then
+                echo "Saving settings ..."
+                save_settings
+            fi
+            exit ;;
     "z") if [ $veeamxfs == "yes" ] ; then
             if [ $vupw != "none" ] ; then
                 if [ $nasip != "none" ] ; then
