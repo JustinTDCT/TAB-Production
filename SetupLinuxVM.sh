@@ -22,7 +22,16 @@ save_settings () {
   crudini --set /etc/tab/conf/default.ini \"\" set_ip \"$set_ip\"
   crudini --set /etc/tab/conf/default.ini \"\" uuid \"$uuid\"
   crudini --set /etc/tab/conf/default.ini \"\" initiator \"$initiator\"
+  crudini --set /etc/tab/conf/default.ini \"\" iscsi_conf \"$iscsi_conf\"
+  crudini --set /etc/tab/conf/default.ini \"\" set_uuid \"$set_uuid\"
+  crudini --set /etc/tab/conf/default.ini \"\" veeam_user \"$veeam_user\"
+  crudini --set /etc/tab/conf/default.ini \"\" veeam_perms \"$veeam_perms\"
+  crudini --set /etc/tab/conf/default.ini \"\" lt_installed \"$lt_installed\"
+  crudini --set /etc/tab/conf/default.ini \"\" fstab_updated \"$fstab_updated\"
+  crudini --set /etc/tab/conf/default.ini \"\" iscsi_edited \"$iscsi_edited\"
+  crudini --set /etc/tab/conf/default.ini \"\" partitioned \"$partitioned\"
 }
+
 
 
 install_key_software () {
