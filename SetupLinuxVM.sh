@@ -238,7 +238,7 @@ else
   get_script_files;
   echo "Baseline setup done, ready to do detailed setup - we will now re-run this script from /etc/tab/scripts; hit any key to continue ...";
   read -rsn1
-  cd /etc/tab/scripts
+  /etc/tab/scripts/./setuplinuxvm.sh
   exit
 fi
 
