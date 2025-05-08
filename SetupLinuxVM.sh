@@ -4,10 +4,12 @@ confini="/etc/tab/conf/default.ini"
 IPOK="no"
 
 get_settings () {
+  echo "Loading settings ..."
   source $confini
 }
 
 save_settings () {
+  echo "Saving settings ..."
   crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" veeamxfs \"$veeamxfs\"
   crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" iscsifail \"$iscsifail\"
   crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" rebooted \"$rebooted\"
@@ -37,12 +39,18 @@ save_settings () {
   crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" partitioned \"$partitioned\"
 }
 
+keystroke () {
+  echo
+  echo "Press any key to continue ..."
+  read -rsn1
+}
 
-
+# ========================================[ Install key programs - mandatory, cannot be skipped ]==================================================
 install_key_software () {
     apt install htop unzip bmon default-jre crudini ncdu -y
 }
 
+# ========================================[ Items to rune the first time the script is run ]==================================================         
 first_run () {
   # Create folder structure
   echo ========== Creating TAB folder structure ==========
@@ -59,6 +67,7 @@ first_run () {
   get_settings
 }
 
+# ========================================[ Disable APT upgrade sharding ]==================================================         
 disable_sharding () {
   echo ========== Disable APT sharding ==========
   sudo cat > /etc/apt/apt.conf.d/99-disable-phasing <<EOF
@@ -67,6 +76,7 @@ disable_sharding () {
 EOF
 }
 
+# ========================================[ Retrive script files ]==================================================         
 get_script_files () {
   echo ========== Grabbing script files ==========
   #echo "- /etc/tab_scripts/SetupVeeam.sh"
@@ -93,7 +103,9 @@ get_script_files () {
   chmod +xX /etc/tab/scripts/checkiscsi.sh
 }
 
+# ========================================[ Add key items to CRONTAB ]==================================================         
 setup_cron () {
+  echo ========== Adjusting CRONTAB ==========
   if [ $setup_cron != "done" ] ; then  
     sed '22,$ d' /etc/crontab > /tab_temp/crontab2
     mv /tab_temp/crontab2 /etc/crontab
@@ -106,9 +118,10 @@ setup_cron () {
   fi
 }
 
+# ========================================[ Run OS updates ]==================================================         
 update_os () {
+  echo ========== Updating Ubuntu OS ==========
   if [ $update_os != "done" ] ; then
-    echo ========== Updating Ubuntu ==========
     apt update
     apt upgrade -y
     update_os="done"
@@ -118,10 +131,10 @@ update_os () {
   fi
 }
 
-
+# ========================================[ Install Webmin ]==================================================         
 install_webmin () {
+  echo ========== Installing WebMin ==========
   if [ $install_webmin != "done" ] ; then
-    echo ========== Installing WebMin ==========
     rm -f /usr/share/keyrings/webmin.gpg
     curl -fsSL https://download.webmin.com/jcameron-key.asc | sudo gpg --dearmor -o /usr/share/keyrings/webmin.gpg
     repos=$(tail  /etc/apt/sources.list | grep -m 1 "webmin")
@@ -141,9 +154,10 @@ install_webmin () {
   fi
 }
 
+# ========================================[ Install Docker ]==================================================         
 install_docker () {
+  echo ========== Installing Docker ==========
   if [ $install_docker != "done" ] ; then
-    echo ========== Installing WebMin ==========
     apt-get update
     apt-get install ca-certificates curl
     install -m 0755 -d /etc/apt/keyrings
@@ -163,9 +177,10 @@ install_docker () {
   fi
 }
 
+# ========================================[ Install Automate ]==================================================         
 install_automate () {
+  echo ========== Installing Automate ==========
   if [ $lt_installed != "done" ] ; then
-    echo ========== Installing Automate ==========
     # download the LT agent
     cd /etc/tab
     wget -O agent.zip $lturl
@@ -202,7 +217,9 @@ install_automate () {
   fi
 }
 
+# ========================================[ Set the Server IP ]==================================================         
 set_ip () {
+  echo ========== Setting the Sevrer IP ==========
   if [ $set_ip == "yes" ] ; then
     echo
     echo "Creating a backup of the current profile ..."
@@ -223,8 +240,8 @@ set_ip () {
     read -p "Enter the IP of your gateway: " gatewayip
     read -p "Enter the IP of preferred nameservers (seperated by a comma if more than one): " nameserversip
     echo
-    echo "Ready to apply new IP - NOTE: If you are SSH'd in your connection will drop and you will need to run the script again (wait about 2m), hit any key to begin ..."
-    read -s
+    echo "Ready to apply new IP - NOTE: If you are SSH'd in your connection will drop and you will need to run the script again (wait about 2m) ..."
+    keystroke
     # creates the new YAML file for the IP
     cat > /etc/netplan/00-installer-config.yaml <<EOF
 network:
@@ -255,7 +272,9 @@ EOF
   fi
 }
 
+# ========================================[ Reset the Tabadmin password ]==================================================         
 reset_tabadmin_pw () {
+  echo ========== Resetting the Tabadmin password ==========
   if [ $tabadmin_pw != "done" ] ; then
     echo "PW provided (so you can cut/paste): $tapw   --- note: once saved it will be purged from the config file"
     passwd tabadmin
@@ -272,6 +291,7 @@ reset_tabadmin_pw () {
   fi
 }
 
+# ========================================[ Install ]==================================================         
 do_install () {
   echo ========== Running selected installs ==========
   update_os
@@ -303,10 +323,14 @@ do_install () {
     echo "Skipping IP setup as defined in config ..."
   fi
   save_settings
-  if [ $tapw == "set" ] ; then
-    echo "Skipping tabadmin password as defined in config ..."
+  if [ $tapw != "none" ] ; then
+      echo "Skipping tabadmin password as defined in config ..."
   else
-    reset_tabadmin_pw
+    if [ $tapw == "set" ] ; then
+      echo "Config file indicates this was already set using the script, please edit the config file or use \"passwd tabadmin\" to manually change it from CLI."
+    else
+      reset_tabadmin_pw
+    fi
   fi
   save_settings
   if [ $lturl != "none" ] ; then
@@ -314,9 +338,7 @@ do_install () {
   else
     echo "Skipping Automate install as no URL was defined ..."
   fi
-  echo
-  echo "Hit any key to continue back to the menu ... "
-  read -rsn1
+  keystroke
 }
 
 function checkCidrFormat {
@@ -340,21 +362,20 @@ if [ "$EUID" -ne 0 ]
 fi
 clear
 echo This script will configure a basic Ubuntu server to try and fit the role it will play within TAB or a client ...
-echo Please use the following menu to set the server parameters. Take a checkpoint before running this. Hit any key to begin ...
-echo
-read -rsn1
+echo Please use the following menu to set the server parameters. Take a checkpoint before running this ...
+keystroke
 
 if [ -f "/etc/tab/conf/default.ini" ]; then
-  echo "This has been run before ... pulling configuration, hit any key to restart setup ...";
+  echo "This has been run before ... pulling configuration";
   get_settings
-  read -rsn1
+  keystroke
 else
   echo "This is the first run of this script - setting up ...";
   first_run;
   disable_sharding;
   get_script_files;
-  echo "Baseline setup done, ready to do detailed setup - we will now re-run this script from /etc/tab/scripts; hit any key to continue ...";
-  read -rsn1
+  echo "Baseline setup done, ready to do detailed setup - we will now re-run this script from /etc/tab/scripts ...";
+  keystroke
   /etc/tab/scripts/./setuplinuxvm.sh
   exit
 fi
@@ -439,23 +460,24 @@ EOF
                         save_settings
                         do_install
                     else
-                        echo "ERROR: Host name of parent system not set! Hit any key to continue ...";
-                        read -rsn1
+                        echo "ERROR: Host name of parent system not set! ...";
+                        keystroke
                     fi
                 else
-                    echo "ERROR: NAS IP not set! Hit any key to continue ...";
-                    read -rsn1
+                    echo "ERROR: NAS IP not set! ...";
+                    keystroke
                 fi
             else
-                echo "ERROR: Veeam user password not set! Hit any key to continue ...";
-                read -rsn1
+                echo "ERROR: Veeam user password not set! ...";
+                keystroke
             fi
          else
              echo "Not a Veeam system!";
              save_settings
              do_install
           fi ;;
-     * )  echo "invalid option"     ;;
+     * )  echo "invalid option"
+                keystroke  ;;
     esac
     sleep 1
 done
