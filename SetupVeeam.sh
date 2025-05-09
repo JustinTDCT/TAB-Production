@@ -155,7 +155,7 @@ do_install () {
   #setup_initiator
   #adjust_iscsi_conf
   #make_iscsi_connection
-  get_uuid
+  get_UUID
 }
 
 
