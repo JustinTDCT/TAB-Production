@@ -291,6 +291,15 @@ reset_tabadmin_pw () {
   fi
 }
 
+check_health () {
+  clear
+  echo "Reloading config data to analyze it ..."
+  get_settings
+  echo "====[ CONFIG FILE CHECK ]===="
+  echo "looking for errant settings"
+  if 
+}
+
 # ========================================[ Install ]==================================================         
 do_install () {
   echo ========== Running selected installs ==========
@@ -323,8 +332,8 @@ do_install () {
     echo "Skipping IP setup as defined in config ..."
   fi
   save_settings
-  if [ $tapw != "none" ] ; then
-      echo "Skipping tabadmin password as defined in config ..."
+  if [ $tapw == "none" ] ; then
+      echo "Skipping tabadmin password as none defined in config ..."
   else
     if [ $tapw == "set" ] ; then
       echo "Config file indicates this was already set using the script, please edit the config file or use \"passwd tabadmin\" to manually change it from CLI."
@@ -401,6 +410,7 @@ do
   p. iSCSI dev name: $devnm
   q. Host server name: $host
 
+  y. Perform TAB script health check
   x. Abort and quit
   z. Start setup 
 
@@ -446,6 +456,7 @@ EOF
     "o") read -p "new NAS IP: " nasip ;;
     "p") read -p "new device id: " devnm ;;
     "q") read -p "hv host name: " host ;;
+    "y") check_health ;;
     "x") read -p "Save your config? Y/n " -n1 -s saveme
             if [ $saveme == "y" ] ; then
                 echo "Saving settings ..."
