@@ -65,6 +65,44 @@ function checkIPFormat {
   fi
 }
 
+check_for_files () {
+  echo "Checking for VBK files"
+  files=$(find $mountpoint2 -name *.vbk | wc -l)
+  if [ $files != "0" ] ; then
+    echo "- VBK files found, skipping the partitioning of thise LUN"
+    partitioned="done"
+  fi
+}
+
+get_UUID () {
+  uuid=$(blkid /dev/sdb)
+  uuid=`echo "$uuid" | cut -d'"' -f 2`
+  echo $uuid
+}
+
+make_iscsi_connection () {
+  echo
+  echo "Attempting the iSCSI connection"
+  echo "- Connecting to the iSCSI LUN"
+  sudo iscsiadm -m discovery -t sendtargets -p $nasip
+  # make sure the command worked and bail if it didn't
+  if [ $? != 0 ]; then
+    echo "- No LUN targets found, script exiting as nothing can be done";
+    exit
+  fi
+  echo
+  echo "- Logging in to iSCSI ..."
+  # connect to the LUNs
+  sudo iscsiadm -m node --login
+  # make sure the command worked and bail if it didn't
+  if [ $? != 0 ]; then
+    echo "- No LUN targets found, script exiting as nothing can be done";
+    exit
+  fi
+  iscsi_conf="done"
+  save_settings
+}
+
 adjust_iscsi_conf () {
   echo
   conftemp=$(crudini --get /etc/iscsi/iscsid.conf "" node.startup)
@@ -83,6 +121,12 @@ adjust_iscsi_conf () {
       echo "- the new setting did not take; install will continue but you need to manuallt set \"node.startup\" in the /etc/iscsi/iscsid.conf file to \"automatic\""
     fi
   fi
+  echo "- restarting the iSCSI service"
+  sudo systemctl restart iscsid open-iscsi
+  if [ $? != 0 ]; then
+    echo "- The service did not restart normally, since nothing more can be done the script will exit";
+    exit
+  fi
 }
 
 setup_initiator () {
@@ -93,12 +137,12 @@ InitiatorName=iqn.2004-10.com.$host:veeamxfs01
 EOF
   # make sure the command worked and bail if it didn't
   if [ $? != 0 ]; then
-    echo "FAIL: could not set the initiator exiting the script since nothing further can be done till that is fixed";
+    echo "- FAIL: could not set the initiator exiting the script since nothing further can be done till that is fixed";
     exit
   fi
   initiator="InitiatorName=iqn.2004-10.com.$host:veeamxfs01"
-  echo "Pausing the script while you verify that the initiator and LUN are set up in the NAS"
-  echo "Initiator: $initiator"
+  echo "- Pausing the script while you verify that the initiator and LUN are set up in the NAS"
+  echo "- Initiator: $initiator"
   keystroke
   set_initiator="done"
   save_settings
@@ -109,7 +153,9 @@ do_install () {
   clear
   echo "Beginning install ..."
   #setup_initiator
-  adjust_iscsi_conf
+  #adjust_iscsi_conf
+  #make_iscsi_connection
+  get_uuid
 }
 
 
