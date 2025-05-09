@@ -78,7 +78,7 @@ update_fstab () {
   echo "Updating FSTAB"
   echo "- backing up file"
   find /etc/fstab -type f | xargs -I {} cp {} {}.bk_`date +%Y%m%d%H%M`
-  echo "- removing existing line for $uuid
+  echo "- removing existing line for $uuid"
   sed -i '/$uuid/d' /etc/fstab
   echo "- adding new line to FSTAB"
   echo "/dev/disk/by-uuid/$uuid /mnt/veeamrepo xfs _netdev 0 0" >> /etc/fstab
