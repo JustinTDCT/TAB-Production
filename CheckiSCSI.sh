@@ -1,6 +1,7 @@
 #!/bin/bash
 # check to ensure you are running as SUDO
 confini="/etc/tab/conf/default.ini"
+passed="yes"
 
 get_settings () {
   echo "Loading settings ..."
@@ -49,6 +50,8 @@ else
   exit
 fi
 
+get_settings
+
 # check to make sure a block device is found for the iSCSI which matches the one defined in the config file
 echo "========================================" >> /etc/tab/logs/checkiscsi.log
 echo "$(date)" >> /etc/tab/logs/checkiscsi.log
@@ -57,18 +60,21 @@ echo "- Testing iSCSI connection at the device level" >> /etc/tab/logs/checkiscs
 lsscsi -t | grep $devnm >> /etc/tab/logs/checkiscsi.log
 if [ $? != 0 ] ; then
   case "$iscsifail" in
-    "yes") echo "- iSCSI has failed in previous check, checking reboot status" >> /etc/tab/logs/checkiscsi.log
+    "yes") echo "- FAIL: 2nd+ failure, checking to see if reboot attempted" >> /etc/tab/logs/checkiscsi.log
            case "$rebooted" in
              "yes") echo "- A reboot has been tried and did not fix the issue, taking no further action" >> /etc/tab/logs/checkiscsi.log
+                    passed="no"
                     ;;
              "no") echo "- Reboot has not been attempted, will do so now" >> /etc/tab/logs/checkiscsi.log
                    rebooted="yes"
                    save_settings
+                   passed="no"
                    #shutdown -r now
                    ;;
            esac ;;
-    "no") echo "- iSCSI did not fail previous check, updating config for this failure" >> /etc/tab/logs/checkiscsi.log
+    "no") echo "- FAIL: 1st failure, will update the config file" >> /etc/tab/logs/checkiscsi.log
           iscsifail="yes"
+          passed="no"
           save_settings
           ;;
   esac
@@ -78,27 +84,54 @@ fi
 
 # check that mount shows the device ID mounted 
 echo "- Testing mount to see if there is a mountpoint for this device" >> /etc/tab/logs/checkiscsi.log
-if [ $iscsifail != "yes" ] ; then
+if [ $passed == "yes" ] ; then
   mount | grep $devnm
   if [ $? != 0 ] ; then
     case "$iscsifail" in
-      "yes") echo "- iSCSI has failed in previous check, checking reboot status" >> /etc/tab/logs/checkiscsi.log
+      "yes") echo "- FAIL: $devnm not found in mount list, 2nd+ failure, checking to see if reboot attempted" >> /etc/tab/logs/checkiscsi.log
              case "$rebooted" in
                "yes") echo "- A reboot has been tried and did not fix the issue, taking no further action" >> /etc/tab/logs/checkiscsi.log
+                      passed="no"
                       ;;
                "no") echo "- Reboot has not been attempted, will do so now" >> /etc/tab/logs/checkiscsi.log
                      rebooted="yes"
                      save_settings
+                     passed="no"
                      #shutdown -r now
                      ;;
              esac ;;
-      "no") echo "- iSCSI did not fail previous check, updating config for this failure" >> /etc/tab/logs/checkiscsi.log
+      "no") echo "- FAIL: $devnm not found in mount list, 1st failure, updating config file" >> /etc/tab/logs/checkiscsi.log
             iscsifail="yes"
+            rebooted="no"
             save_settings
+            passed="no"
             ;;
     esac
   else
-    # PASSED SECOND CHECK
+     mount | grep $dmountpoint
+    if [ $? != 0 ] ; then
+      case "$iscsifail" in
+        "yes") echo "- FAIL: $mountpoint not found in mount list, 2nd+ failure, checking to see if reboot attempted" >> /etc/tab/logs/checkiscsi.log
+               case "$rebooted" in
+                 "yes") echo "- A reboot has been tried and did not fix the issue, taking no further action" >> /etc/tab/logs/checkiscsi.log
+                        passed="no"
+                        ;;
+                 "no") echo "- Reboot has not been attempted, will do so now" >> /etc/tab/logs/checkiscsi.log
+                       rebooted="yes"
+                       save_settings
+                       passed="no"
+                       #shutdown -r now
+                       ;;
+               esac ;;
+        "no") echo "- FAIL: $mountpoint not found in mount list, 1st failure, updating config file" >> /etc/tab/logs/checkiscsi.log
+              iscsifail="yes"
+              save_settings
+              passed="no"
+              ;;
+      esac
+    else
+      # PASSED SECOND CHECK
+    fi
   fi
 fi
 
