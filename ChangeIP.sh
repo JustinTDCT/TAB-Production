@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# READY FOR TESTING IN PRODUCTION
 confini="/etc/tab/conf/default.ini"
 IPOK="no"
 
