@@ -64,6 +64,21 @@ function checkCidrFormat {
   fi
 }
 
+function checkIPFormat {
+  IPOK="no"
+  local ipCidr="${1}"
+  local validIpCidr
+  validIpCidr='(^([1-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5]))$'
+  if [[ $ipCidr =~ ^$validIpCidr ]]; then
+    echo "Format valid"
+    IPOK="yes"
+    return 0
+  else
+    echo "Not a CIDR format"
+    return 1
+  fi
+}
+
 get_settings
 while :
 do
