@@ -83,8 +83,37 @@ if [ $veeamxfs != "yes" ] ; then
     fi
 fi
 if [ $vupw == "none" ] ; then
-
-
+  echo "- no password has been set for the Veeam user you need to set one now ..."
+  read -p "new veeamuser password: " vupw
+  save_settings
+fi
+if [ $nasip == "none" ] ; then
+  echo "- no NAS IP defined, please define one now ..."
+  echo "Enter the IP in regular format. IE, 192.168.1.123"
+  while [[ $IPOK == "no" ]] ;
+    do
+      read -rp "new IP: " nasip
+      if checkIPFormat "${nasip}"; then
+        echo "Moving on..."
+      fi
+      done 
+      IPOK="no"
+else
+  echo "- Data found in NAS IP, verifying it is an IP ..."
+  if checkIPFormat "${nasip}"; then  
+    echo "- verified format"
+  else
+    echo "- this does not appear to be a valid IP format, please enter a new one ..."
+    while [[ $IPOK == "no" ]] ;
+      do
+        read -rp "new IP: " nasip
+        if checkIPFormat "${nasip}"; then
+          echo "Moving on..."
+        fi
+        done 
+      IPOK="no"
+  fi
+fi
 
 
 
