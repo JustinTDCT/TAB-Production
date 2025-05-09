@@ -1,4 +1,5 @@
 #!/bin/bash
+# READY FOR TESTING IN PRODUCTION
 echo "Killing service ..."
 pkill -9 ltechagent 2> /dev/null
 service ltechagent status
