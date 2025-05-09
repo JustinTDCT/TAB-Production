@@ -74,10 +74,24 @@ check_for_files () {
   fi
 }
 
+update_fstab () {
+  echo "Updating FSTAB"
+  echo "- backing up file"
+  find /etc/fstab -type f | xargs -I {} cp {} {}.bk_`date +%Y%m%d%H%M`
+  echo "- removing existing line for $uuid
+  sed -i '/$uuid/d' /etc/fstab
+  echo "- adding new line to FSTAB"
+  echo "/dev/disk/by-uuid/$uuid /mnt/veeamrepo xfs _netdev 0 0" >> /etc/fstab
+}
+
+
 get_UUID () {
-  uuid=$(blkid /dev/sdb)
+  echo "Retriving UUID"
+  uuid=$(blkid $devnm)
   uuid=`echo "$uuid" | cut -d'"' -f 2`
-  echo $uuid
+  echo "- UUID = $uuid for $devnm"
+  set_uuid="done"
+  save_settings
 }
 
 make_iscsi_connection () {
@@ -156,6 +170,7 @@ do_install () {
   #adjust_iscsi_conf
   #make_iscsi_connection
   get_UUID
+  update_fstab
 }
 
 
