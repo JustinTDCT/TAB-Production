@@ -1,4 +1,5 @@
 #!/bin/bash
+# READY FOR TESTING IN PRODUCTION
 confini="/etc/tab/conf/default.ini"
 IPOK="no"
 
@@ -74,7 +75,7 @@ function checkIPFormat {
     IPOK="yes"
     return 0
   else
-    echo "Not a CIDR format"
+    echo "Not a valid IP"
     return 1
   fi
 }
@@ -202,7 +203,7 @@ EOF
             while [[ $IPOK == "no" ]] ;
               do
               read -rp "new IP: " nasip
-              if checkCidrFormat "${nasip}"; then
+              if checkIPFormat "${nasip}"; then
               echo "Moving on..."
               fi
             done 
