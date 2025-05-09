@@ -129,11 +129,13 @@ if [ $host == "none" ] ; then
   read -p "hv host name: " host ;
 fi
 read -p "Change the device namne - currently $devnm? [y/N] " -n1 -s chrtmp
+echo 
   if [ $chrtmp == "y" ] ; then
     read -p "new device id: " devnm
     save_settings
   fi
 read -p "Change the mountpoint - currently $mountpoint? [y/N] " -n1 -s chrtmp
+echo
   if [ $chrtmp == "y" ] ; then
     read -p "new mountpoint: " mountpoint
     save_settings
