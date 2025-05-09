@@ -1,4 +1,4 @@
-#!/bin/bash
+  #!/bin/bash
 # check to ensure you are running as SUDO
 confini="/etc/tab/conf/default.ini"
 IPOK="no"
@@ -370,6 +370,21 @@ function checkCidrFormat {
   fi
 }
 
+function checkIPFormat {
+  IPOK="no"
+  local ipCidr="${1}"
+  local validIpCidr
+  validIpCidr='(^([1-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5]))$'
+  if [[ $ipCidr =~ ^$validIpCidr ]]; then
+    echo "Format valid"
+    IPOK="yes"
+    return 0
+  else
+    echo "Not a valid IP"
+    return 1
+  fi
+}
+
 if [ "$EUID" -ne 0 ]
   then echo "WARNING: This needs to be run as SUDO!"
   exit
@@ -459,7 +474,15 @@ EOF
     "e") read -p "new agent URL: " lturl ;;
     "f") read -p "new tabadmin password: " tapw ;;
     "n") read -p "new veeamuser password: " vupw ;;
-    "o") read -p "new NAS IP: " nasip ;;
+    "o") echo "Enter the IP in regular format. IE, 192.168.1.123"
+           while [[ $IPOK == "no" ]] ;
+             do
+              read -rp "new IP: " nasip
+              if checkIPFormat "${nasip}"; then
+              echo "Moving on..."
+              fi
+            done 
+            IPOK="no" ;;         
     "p") read -p "new device id: " devnm ;;
     "q") read -p "hv host name: " host ;;
     "r") read -p "new mountpoint: " mountpoint ;;
