@@ -51,6 +51,7 @@ else
 fi
 
 get_settings
+mountpoint2=${mountpoint::-1}
 
 # check to make sure a block device is found for the iSCSI which matches the one defined in the config file
 echo  >> /etc/tab/logs/checkiscsi.log
@@ -93,7 +94,7 @@ fi
 # check that mount shows the device ID mounted 
 echo "- Testing mount for $devnm and $mountpoint in the same line" >> /etc/tab/logs/checkiscsi.log
 if [ $passed == "yes" ] ; then
-  mount | grep $devnm | grep $mountpoint &>> /etc/tab/logs/checkiscsi.log
+  mount | grep $devnm | grep $mountpoint2 &>> /etc/tab/logs/checkiscsi.log
   if [ $? != 0 ] ; then
     case "$iscsifail" in
       "yes") echo "- FAIL: $devnm not found in mount list, 2nd+ failure, checking to see if reboot attempted" >> /etc/tab/logs/checkiscsi.log
@@ -136,7 +137,7 @@ if [ $passed == "yes" ] ; then
              echo "$(date)" >> /etc/tab/logs/xfs_repair.log
              echo "----------------------------------------" >> /etc/tab/logs/xfs_repair.log
              echo "- unmounting $mountpoint" >> /etc/tab/logs/xfs_repair.log
-             umount $mountpoint &>> /etc/tab/logs/xfs_repair.log
+             umount $mountpoint2 &>> /etc/tab/logs/xfs_repair.log
              if [ $? != 0 ] ; then
                echo "- Dismount did not work, skipping the health test, see /etc/tab/logs/xfs_repair.log for details" >> /etc/tab/logs/checkiscsi.log
              else
