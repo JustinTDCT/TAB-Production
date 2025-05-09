@@ -302,7 +302,6 @@ check_health () {
   get_settings
   echo "====[ CONFIG FILE CHECK ]===="
   echo "looking for errant settings"
-  if 
 }
 
 # ========================================[ Install ]==================================================         
