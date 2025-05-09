@@ -163,8 +163,22 @@ EOF
     "u") if [ $iscsi_edited == "yes" ] ; then iscsi_edited="done"
          else iscsi_edited="yes"
          fi ;;     
-    
-    "e") read -p "new agent URL: " lturl ;;
+    "1") read -p "new veeamuser password: " vupw ;;
+    "2") read -p "new device id: " devnm ;;
+    "3") echo
+         echo "changing this does not re-do the iSCSI settings!"
+         read -p "new NAS IP: " nasip ;; # update this to verify this is an IP entered
+    "4") read -p "hv host name: " host ;;
+    "5") echo
+         echo "changing this does not change the FSTAB info!"
+         read -p "new UUID: " uuid ;;
+    "6") read -p "new initiator: " initiator ;;
+    "7") read -p "new tabadmin password: " tapw ;;
+    "8") read -p "new agent URL: " lturl ;;
+    "9") echo
+         echo "changing this does not re-ip the server!"
+         read -p "new server IP: " serverip ;; # update this to verify this is an IP entered
+    "0") read -p "new agent URL: " lturl ;;
     "!") save_settings
          clear
          exit ;;
