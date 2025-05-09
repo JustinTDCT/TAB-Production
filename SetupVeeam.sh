@@ -65,6 +65,13 @@ function checkIPFormat {
   fi
 }
 
+do_install () {
+  clear
+  echo "Beginning install ..."
+}
+
+
+
 clear
 get_settings
 echo "Config file: $confini"
@@ -140,3 +147,19 @@ echo
     read -p "new mountpoint: " mountpoint
     save_settings
   fi
+echo 
+echo "Recap parameters:"
+echo "- VeeamXFS Server: $veeamxfs"
+echo "- NAS IP: $nasip"
+echo "- Veeam user password: $vupw"
+echo "- Host system or ATN: $host"
+echo "- Device nanme: $devnm"
+echo "- Mountpoint: $mountpoint"
+echo
+read -p "Proceed with install? [Y/n] " -n1 -s chrtmp
+echo 
+if [ $chrtmp == "n" ] ; then
+  echo "NOTICE: Aborting install as requested!"
+  exit
+fi
+do_install
