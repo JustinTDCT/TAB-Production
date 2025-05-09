@@ -68,13 +68,14 @@ do
   k. STAGE: Tabadmin Password Change: $tabadmin_pw
   l. STAGE: NAS IP Set: $set_nasip
   m. STAGE: Intiator Set: $set_initiator
-  n. STAGE: iSCSI Conf Updated: $iscsi_conf
+  n. STAGE: iSCSI Configuration Done: $iscsi_conf
   o. STAGE: UUID Set: $set_uuid
   p. STAGE: Veeam User Created: $veeam_user
   q. STAGE: iSCSI Permissions Set: $veeam_perms
   q. STAGE: Automate Instakked: $lt_installed
   r. STAGE: FStab Updated: $fstab_updated
   s. STAGE: iSCSI Partitioned: $partitioned
+  t. STAGE: iSCSI Config File Edited: $iscsi_edited
 
   [MANUAL SETTINGS]
   1. Veeam User Passsword: $vupw
@@ -86,14 +87,77 @@ do
   7. Tabadmin Password: $tapw
   8. Automate Agent URL: $lturl
   9. Server IP: $serverip
+  0. XFS Mount Point: $mountpoint
 
   !. Save and exit
   ^. Exit, no save
+  $. Script version
 
 EOF
     read -n1 -s menu
     menu="${menu,,}"
     case "$menu" in
+    "a") if [ $veeamxfs == "yes" ] ; then veeamxfs="no"
+         else veeamxfs="yes"
+         fi ;; 
+    "b") if [ $webmin == "yes" ] ; then webmin="no"
+         else webmin="yes"
+         fi ;;     
+    "c") if [ $docker == "yes" ] ; then docker="no"
+         else docker="yes"
+         fi ;;     
+    "d") if [ $iscsifail == "yes" ] ; then iscsifail="no"
+         else iscsifail="yes"
+         fi ;;     
+    "e") if [ $rebooted == "yes" ] ; then rebooted="no"
+         else rebooted="yes"
+         fi ;;     
+    "f") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    "g") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    "h") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    "i") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    "j") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    "k") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    "l") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    "m") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    "n") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    "o") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    "p") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    "q") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    "r") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    "s") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    "t") if [ $setup_cron == "yes" ] ; then setup_cron="done"
+         else setup_cron="yes"
+         fi ;;     
+    
     "e") read -p "new agent URL: " lturl ;;
     "!") save_settings
          clear
@@ -103,5 +167,5 @@ EOF
     * ) echo "Invalid option"
         keystroke ;;
     esac
-    sleep 1
+#    sleep 1
 done
