@@ -65,14 +65,9 @@ function checkIPFormat {
   fi
 }
 
-
-
-
-
-
-
-get_settings
 clear
+get_settings
+echo "Config file: $confini"
 echo "Values pulled from the config:"
 echo "- VeeamXFS Server: $veeamxfs"
 echo "- NAS IP: $nasip"
@@ -85,7 +80,9 @@ echo "Performing a quick check of the config file settings; you will be prompted
 if [ $veeamxfs != "yes" ] ; then
   echo "- Server not flagged as a VeeamXFS server; while this won't stop the install it should be fixed."
   read -p "Fix this? Y/n " -n1 -s chrtmp
-    if [ $chrtmp == "y" ] ; then
+    if [ $chrtmp == "n" ] ; then
+      echo "- Leaving for now, but this should be fixed later"
+    else
       veeamxfs="yes"
       save_settings
     fi
@@ -131,3 +128,13 @@ if [ $host == "none" ] ; then
   echo "- no hostname defined, please do so - this should be the host server or if this is a physical the ATN # ..."
   read -p "hv host name: " host ;
 fi
+read -p "Change the device namne - currently $devnm? [y/N] " -n1 -s chrtmp
+  if [ $chrtmp == "y" ] ; then
+    read -p "new device id: " devnm
+    save_settings
+  fi
+read -p "Change the mountpoint - currently $mountpoint? [y/N] " -n1 -s chrtmp
+  if [ $chrtmp == "y" ] ; then
+    read -p "new mountpoint: " mountpoint
+    save_settings
+  fi
