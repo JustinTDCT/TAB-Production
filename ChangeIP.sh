@@ -50,37 +50,36 @@ keystroke () {
   read -rsn1
 }
 
-function checkIPFormat {
+function checkCidrFormat {
   IPOK="no"
   local ipCidr="${1}"
   local validIpCidr
-  validIpCidr='(^([1-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5]))$'
+  validIpCidr='(^([1-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\/([1-9]|[1-2][0-9]|[3][0-2]))$'
   if [[ $ipCidr =~ ^$validIpCidr ]]; then
     echo "Format valid"
     IPOK="yes"
     return 0
   else
-    echo "Not a valid IP"
+    echo "Not a CIDR format"
     return 1
   fi
 }
 
 get_settings
 clear
-read -p "The config file has an IP of $nasip ... do you need to change this? [y/N] " -n1 -s changeip
-            if [ $changeip == "y" ] ; then
-              echo
-              echo "Enter the IP in regular format. IE, 192.168.1.123"
-                while [[ $IPOK == "no" ]] ;
-                do
-                  read -rp "new IP: " nasip
-                  if checkIPFormat "${nasip}"; then
-                    echo "Moving on..."
-                    save_settings
-                  fi
-                done 
-              IPOK="no"    
-            fi
+read -p "The config file has an IP of $serverip ... do you need to change this? [y/N] " -n1 -s changeip
+  if [ $changeip == "y" ] ; then
+    echo
+    echo "Enter the IP in CIDR format. IE, 192.168.1.123/24"
+      while [[ $IPOK == "no" ]] ;
+      do
+        read -rp "new IP: " serverip
+        if checkCidrFormat "${serverip}"; then
+          echo "Moving on..."
+        fi
+      done 
+      IPOK="no"
+    fi
 
 
 echo ========== Setting the Sevrer IP ==========
