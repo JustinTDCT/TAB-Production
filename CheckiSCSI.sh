@@ -1,7 +1,6 @@
 #!/bin/bash
 # check to ensure you are running as SUDO
 confini="/etc/tab/conf/default.ini"
-IPOK="no"
 
 get_settings () {
   echo "Loading settings ..."
@@ -20,6 +19,7 @@ save_settings () {
   crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" host \"$host\"
   crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" uuid \"$uuid\"
   crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" initiator \"$initiator\"
+  crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" mountpoint \"$mountpoint\"
   crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" tapw \"$tapw\"
   crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" lturl \"$lturl\"
   crudini --ini-options=nospace --set /etc/tab/conf/default.ini "" serverip \"$serverip\"
@@ -48,10 +48,62 @@ if [[ "$HOSTNAME" == *"veeam"* ]]; then
 else
   exit
 fi
+
+# check to make sure a block device is found for the iSCSI which matches the one defined in the config file
 echo "========================================" >> /etc/tab/logs/checkiscsi.log
 echo "$(date)" >> /etc/tab/logs/checkiscsi.log
 echo "----------------------------------------" >> /etc/tab/logs/checkiscsi.log
 echo "- Testing iSCSI connection at the device level" >> /etc/tab/logs/checkiscsi.log
-lsscsi -t | grep %dev
+lsscsi -t | grep $devnm >> /etc/tab/logs/checkiscsi.log
+if [ $? != 0 ] ; then
+  case "$iscsifail" in
+    "yes") echo "- iSCSI has failed in previous check, checking reboot status" >> /etc/tab/logs/checkiscsi.log
+           case "$rebooted" in
+             "yes") echo "- A reboot has been tried and did not fix the issue, taking no further action" >> /etc/tab/logs/checkiscsi.log
+                    ;;
+             "no") echo "- Reboot has not been attempted, will do so now" >> /etc/tab/logs/checkiscsi.log
+                   rebooted="yes"
+                   save_settings
+                   #shutdown -r now
+                   ;;
+           esac ;;
+    "no") echo "- iSCSI did not fail previous check, updating config for this failure" >> /etc/tab/logs/checkiscsi.log
+          iscsifail="yes"
+          save_settings
+          ;;
+  esac
+else
+  # PASSED FIRST CHECK
+fi
+
+# check that mount shows the device ID mounted 
+echo "- Testing mount to see if there is a mountpoint for this device" >> /etc/tab/logs/checkiscsi.log
+if [ $iscsifail != "yes" ] ; then
+  mount | grep $devnm
+  if [ $? != 0 ] ; then
+    case "$iscsifail" in
+      "yes") echo "- iSCSI has failed in previous check, checking reboot status" >> /etc/tab/logs/checkiscsi.log
+             case "$rebooted" in
+               "yes") echo "- A reboot has been tried and did not fix the issue, taking no further action" >> /etc/tab/logs/checkiscsi.log
+                      ;;
+               "no") echo "- Reboot has not been attempted, will do so now" >> /etc/tab/logs/checkiscsi.log
+                     rebooted="yes"
+                     save_settings
+                     #shutdown -r now
+                     ;;
+             esac ;;
+      "no") echo "- iSCSI did not fail previous check, updating config for this failure" >> /etc/tab/logs/checkiscsi.log
+            iscsifail="yes"
+            save_settings
+            ;;
+    esac
+  else
+    # PASSED SECOND CHECK
+  fi
+fi
+
+# check that VBK files exist on the mount point
+if [ $iscsifail != "yes" ] ; then
+fi
 
 
