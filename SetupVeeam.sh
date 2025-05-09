@@ -73,6 +73,14 @@ function checkIPFormat {
 
 get_settings
 clear
+echo "Values pulled from the config:"
+echo "- VeeamXFS Server: $veeamxfs"
+echo "- NAS IP: $nasip"
+echo "- Veeam user password: $vupw"
+echo "- Host system or ATN: $host"
+echo "- Device nanme: $devnm"
+echo "- Mountpoint: $mountpoint"
+echo
 echo "Performing a quick check of the config file settings; you will be prompted to fix missing or invalid settings ..."
 if [ $veeamxfs != "yes" ] ; then
   echo "- Server not flagged as a VeeamXFS server; while this won't stop the install it should be fixed."
@@ -87,6 +95,9 @@ if [ $vupw == "none" ] ; then
   read -p "new veeamuser password: " vupw
   save_settings
 fi
+if [ $vupw == "set" ] ; then
+  echo "- the config indicates this user password was setup previously - if you want to change it enter \"passwd veeamuser\" at the CLI to change it manually ..."
+fi
 if [ $nasip == "none" ] ; then
   echo "- no NAS IP defined, please define one now ..."
   echo "Enter the IP in regular format. IE, 192.168.1.123"
@@ -95,6 +106,7 @@ if [ $nasip == "none" ] ; then
       read -rp "new IP: " nasip
       if checkIPFormat "${nasip}"; then
         echo "Moving on..."
+        save_settings
       fi
       done 
       IPOK="no"
@@ -109,13 +121,13 @@ else
         read -rp "new IP: " nasip
         if checkIPFormat "${nasip}"; then
           echo "Moving on..."
+          save_settings
         fi
         done 
       IPOK="no"
   fi
 fi
-
-
-
-
-
+if [ $host == "none" ] ; then
+  echo "- no hostname defined, please do so - this should be the host server or if this is a physical the ATN # ..."
+  read -p "hv host name: " host ;
+fi
