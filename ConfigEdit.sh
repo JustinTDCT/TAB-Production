@@ -146,7 +146,7 @@ EOF
          else set_uuid="yes"
          fi ;;     
     "p") if [ $veeam_user == "yes" ] ; then veeam_user="done"
-         else sveeam_user="yes"
+         else veeam_user="yes"
          fi ;;     
     "q") if [ $veeam_perms == "yes" ] ; then veeam_perms="done"
          else veeam_perms="yes"
