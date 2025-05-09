@@ -198,7 +198,15 @@ EOF
     "2") read -p "new device id: " devnm ;;
     "3") echo
          echo "changing this does not re-do the iSCSI settings!"
-         read -p "new NAS IP: " nasip ;; # update this to verify this is an IP entered
+         echo "Enter the IP in regular format. IE, 192.168.1.123"
+            while [[ $IPOK == "no" ]] ;
+              do
+              read -rp "new IP: " nasip
+              if checkCidrFormat "${nasip}"; then
+              echo "Moving on..."
+              fi
+            done 
+            IPOK="no" ;;         
     "4") read -p "hv host name: " host ;;
     "5") echo
          echo "changing this does not change the FSTAB info!"
