@@ -98,8 +98,11 @@ get_script_files () {
   wget -O /bin/nightlyactions.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/NightlyActions.sh 2> /dev/null
   echo "- /etc/tab/scripts/checkiscsi.sh"
   wget -O /etc/tab/scripts/checkiscsi.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/CheckiSCSI.sh 2> /dev/null
+  echo "- /etc/tab/scripts/configedit.sh"
+  wget -O /etc/tab/scripts/configedit.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/ConfigEdit.sh 2> /dev/null
   # make the files executable (8 files)
   #chmod +xX /etc/tab/scripts/SetupVeeamVM.sh
+  chmod +xX /etc/tab/scripts/configedit.sh
   chmod +xX /etc/tab/scripts/changeip.sh
   chmod +xX /etc/tab/scripts/setuplinuxvm.sh
   chmod +xX /bin/bouncelt.sh
