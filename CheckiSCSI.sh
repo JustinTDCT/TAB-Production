@@ -124,7 +124,7 @@ fi
 # check that VBK files exist on the mount point
 if [ $passed == "yes" ] ; then
   echo "- Testing that backup files exist in mountpoint" >> /etc/tab/logs/checkiscsi.log
-  files=$(find $mountpoint -name *.vbk | wc -l)
+  files=$(find $mountpoint2 -name *.vbk | wc -l)
   if [ $files != "0" ] ; then
     case "$iscsifail" in
       "yes") echo "- Found $files VBK files; previously there had been a failure; resetting config data and performing XFS health check" >> /etc/tab/logs/checkiscsi.log
