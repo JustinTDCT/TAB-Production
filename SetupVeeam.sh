@@ -65,6 +65,25 @@ function checkIPFormat {
   fi
 }
 
+adjust_iscsi_conf () {
+  echo
+  conftemp=$(crudini --get /etc/iscsi/iscsid.conf "" node.startup)
+  echo "Checking and updating the iSCSI config file"
+  if [ $conftemp == automatic ] ; then
+    echo "- node startup is already automatic, moving on"
+  else 
+    echo "-node startup found to be $conftemp, setting to automatic"
+    crudini --set /etc/iscsi/iscsid.conf "" node.startup automatic
+    conftemp=$(crudini --get /etc/iscsi/iscsid.conf "" node.startup)
+    if [ $conftemp == automatic ] ; then
+      echo "- new setting confirmed, moving on"
+      iscsi_edited="done"
+      save_settings
+    else
+      echo "- the new setting did not take; install will continue but you need to manuallt set \"node.startup\" in the /etc/iscsi/iscsid.conf file to \"automatic\""
+    fi
+  fi
+}
 
 setup_initiator () {
   echo
@@ -89,7 +108,8 @@ EOF
 do_install () {
   clear
   echo "Beginning install ..."
-  setup_initiator
+  #setup_initiator
+  adjust_iscsi_conf
 }
 
 
