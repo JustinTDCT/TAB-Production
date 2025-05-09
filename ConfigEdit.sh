@@ -1,5 +1,6 @@
 #!/bin/bash
 confini="/etc/tab/conf/default.ini"
+IPOK="no"
 
 get_settings () {
   echo "Loading settings ..."
@@ -46,6 +47,21 @@ keystroke () {
   echo
   echo "Press any key to continue ..."
   read -rsn1
+}
+
+function checkCidrFormat {
+  IPOK="no"
+  local ipCidr="${1}"
+  local validIpCidr
+  validIpCidr='(^([1-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\/([1-9]|[1-2][0-9]|[3][0-2]))$'
+  if [[ $ipCidr =~ ^$validIpCidr ]]; then
+    echo "Format valid"
+    IPOK="yes"
+    return 0
+  else
+    echo "Not a CIDR format"
+    return 1
+  fi
 }
 
 get_settings
@@ -177,7 +193,15 @@ EOF
     "8") read -p "new agent URL: " lturl ;;
     "9") echo
          echo "changing this does not re-ip the server!"
-         read -p "new server IP: " serverip ;; # update this to verify this is an IP entered
+         echo "Enter the IP in CIDR format. IE, 192.168.1.123/24"
+            while [[ $IPOK == "no" ]] ;
+              do
+              read -rp "new IP: " serverip
+              if checkCidrFormat "${serverip}"; then
+              echo "Moving on..."
+              fi
+            done 
+            IPOK="no" ;;
     "0") read -p "new agent URL: " lturl ;;
     "!") save_settings
          clear
