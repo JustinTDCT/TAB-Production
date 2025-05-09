@@ -49,3 +49,44 @@ keystroke () {
   echo "Press any key to continue ..."
   read -rsn1
 }
+
+function checkIPFormat {
+  IPOK="no"
+  local ipCidr="${1}"
+  local validIpCidr
+  validIpCidr='(^([1-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5]))$'
+  if [[ $ipCidr =~ ^$validIpCidr ]]; then
+    echo "Format valid"
+    IPOK="yes"
+    return 0
+  else
+    echo "Not a valid IP"
+    return 1
+  fi
+}
+
+
+
+
+
+
+
+get_settings
+clear
+echo "Performing a quick check of the config file settings; you will be prompted to fix missing or invalid settings ..."
+if [ $veeamxfs != "yes" ] ; then
+  echo "- Server not flagged as a VeeamXFS server; while this won't stop the install it should be fixed."
+  read -p "Fix this? Y/n " -n1 -s chrtmp
+    if [ $chrtmp == "y" ] ; then
+      veeamxfs="yes"
+      save_settings
+    fi
+fi
+if [ $vupw == "none" ] ; then
+
+
+
+
+
+
+
