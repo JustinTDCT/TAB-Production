@@ -65,9 +65,31 @@ function checkIPFormat {
   fi
 }
 
+
+setup_initiator () {
+  echo
+  echo "Setting up the iSCSI initiator ..."
+  sudo cat > /etc/iscsi/initiatorname.iscsi <<EOF
+InitiatorName=iqn.2004-10.com.$host:veeamxfs01
+EOF
+  # make sure the command worked and bail if it didn't
+  if [ $? != 0 ]; then
+    echo "FAIL: could not set the initiator exiting the script since nothing further can be done till that is fixed";
+    exit
+  fi
+  initiator="InitiatorName=iqn.2004-10.com.$host:veeamxfs01"
+  echo "Pausing the script while you verify that the initiator and LUN are set up in the NAS"
+  echo "Initiator: $initiator"
+  keystroke
+  set_initiator="done"
+  save_settings
+}
+
+
 do_install () {
   clear
   echo "Beginning install ..."
+  setup_initiator
 }
 
 
