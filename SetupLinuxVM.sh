@@ -414,6 +414,7 @@ do
   o. NAS IP: $nasip
   p. iSCSI dev name: $devnm
   q. Host server name: $host
+  r. Veeam XFS mount point: $mountpoint
 
   y. Perform TAB script health check
   x. Abort and quit
@@ -461,6 +462,7 @@ EOF
     "o") read -p "new NAS IP: " nasip ;;
     "p") read -p "new device id: " devnm ;;
     "q") read -p "hv host name: " host ;;
+    "r") read -p "new mountpoint: " mountpoint ;;
     "y") check_health ;;
     "x") read -p "Save your config? Y/n " -n1 -s saveme
             if [ $saveme == "y" ] ; then
