@@ -47,7 +47,7 @@ keystroke () {
 
 # ========================================[ Install key programs - mandatory, cannot be skipped ]==================================================
 install_key_software () {
-    apt install htop unzip bmon default-jre crudini ncdu -y
+    apt install htop unzip bmon default-jre crudini ncdu lsscsi -y
 }
 
 # ========================================[ Items to rune the first time the script is run ]==================================================         
