@@ -75,10 +75,10 @@ do
   o. STAGE: UUID Set: $set_uuid
   p. STAGE: Veeam User Created: $veeam_user
   q. STAGE: iSCSI Permissions Set: $veeam_perms
-  q. STAGE: Automate Instakked: $lt_installed
-  r. STAGE: FStab Updated: $fstab_updated
-  s. STAGE: iSCSI Partitioned: $partitioned
-  t. STAGE: iSCSI Config File Edited: $iscsi_edited
+  r. STAGE: Automate Instakked: $lt_installed
+  s. STAGE: FStab Updated: $fstab_updated
+  t. STAGE: iSCSI Partitioned: $partitioned
+  u. STAGE: iSCSI Config File Edited: $iscsi_edited
 
   [MANUAL SETTINGS]
   1. Veeam User Passsword: $vupw
@@ -115,49 +115,52 @@ EOF
     "e") if [ $rebooted == "yes" ] ; then rebooted="no"
          else rebooted="yes"
          fi ;;     
-    "f") if [ $update_os == "yes" ] ; then update_os="done"
+    "f") if [ $setup_cron == "yes" ] ; then setup_cron="no"
+         else setup_cron="yes"
+         fi ;;   
+    "g") if [ $update_os == "yes" ] ; then update_os="done"
          else update_os="yes"
          fi ;;     
-    "g") if [ $install_webmin == "yes" ] ; then install_webmin="done"
+    "h") if [ $install_webmin == "yes" ] ; then install_webmin="done"
          else install_webmin="yes"
          fi ;;     
-    "h") if [ $install_docker == "yes" ] ; then install_docker="done"
+    "i") if [ $install_docker == "yes" ] ; then install_docker="done"
          else install_docker="yes"
          fi ;;     
-    "i") if [ $set_ip == "yes" ] ; then set_ip="done"
+    "j") if [ $set_ip == "yes" ] ; then set_ip="done"
          else set_ip="yes"
          fi ;;     
-    "j") if [ $tabadmin_pw == "yes" ] ; then tabadmin_pw="done"
+    "k") if [ $tabadmin_pw == "yes" ] ; then tabadmin_pw="done"
          else tabadmin_pw="yes"
          fi ;;     
-    "k") if [ $set_nasip == "yes" ] ; then set_nasip="done"
+    "l") if [ $set_nasip == "yes" ] ; then set_nasip="done"
          else set_nasip="yes"
          fi ;;     
-    "l") if [ $set_initiator == "yes" ] ; then set_initiator="done"
+    "m") if [ $set_initiator == "yes" ] ; then set_initiator="done"
          else set_initiator="yes"
          fi ;;     
-    "m") if [ $iscsi_conf == "yes" ] ; then iscsi_conf="done"
+    "n") if [ $iscsi_conf == "yes" ] ; then iscsi_conf="done"
          else iscsi_conf="yes"
          fi ;;     
-    "n") if [ $set_uuid == "yes" ] ; then set_uuid="done"
+    "o") if [ $set_uuid == "yes" ] ; then set_uuid="done"
          else set_uuid="yes"
          fi ;;     
-    "o") if [ $veeam_user == "yes" ] ; then veeam_user="done"
+    "p") if [ $veeam_user == "yes" ] ; then veeam_user="done"
          else sveeam_user="yes"
          fi ;;     
-    "p") if [ $veeam_perms == "yes" ] ; then veeam_perms="done"
+    "q") if [ $veeam_perms == "yes" ] ; then veeam_perms="done"
          else veeam_perms="yes"
          fi ;;     
-    "q") if [ $lt_installed == "yes" ] ; then lt_installed="done"
+    "r") if [ $lt_installed == "yes" ] ; then lt_installed="done"
          else lt_installed="yes"
          fi ;;     
-    "r") if [ $fstab_updated == "yes" ] ; then fstab_updated="done"
+    "s") if [ $fstab_updated == "yes" ] ; then fstab_updated="done"
          else fstab_updated="yes"
          fi ;;     
-    "s") if [ $partitioned == "yes" ] ; then partitioned="done"
+    "t") if [ $partitioned == "yes" ] ; then partitioned="done"
          else partitioned="yes"
          fi ;;     
-    "t") if [ $iscsi_edited == "yes" ] ; then iscsi_edited="done"
+    "u") if [ $iscsi_edited == "yes" ] ; then iscsi_edited="done"
          else iscsi_edited="yes"
          fi ;;     
     
