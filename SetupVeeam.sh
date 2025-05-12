@@ -65,6 +65,28 @@ function checkIPFormat {
   fi
 }
 
+check_for_existing_UUID () {
+  blkid | grep $devnm
+  if [ $? != 0 ] ; then
+    echo "- no UUID has been found which means there is no recognized partition - do you want to make one? Saying no exits the script. [Y/n] "
+    read -rsn1 saveme
+    if [ $saveme == "y" ] ; then
+      echo "- making the new partition"
+      sudo parted --script $devnm "mklabel gpt"
+      sudo parted --script $devnm "mkpart primary 0% 100%"
+      echo "- formatting the partion"
+      sudo mkfs.xfs -b size=4096 -m reflink=1,crc=1 $devnm -f -K
+      save_settings
+    else
+      echo "Exiting script"
+      exit
+    fi
+  else
+    echo "- UUID exists moving ahead adn will try to mount this to see if there are files present"
+  fi
+}
+
+
 check_for_files () {
   echo "Checking for VBK files"
   files=$(find $mountpoint2 -name *.vbk | wc -l)
@@ -94,6 +116,20 @@ get_UUID () {
   save_settings
 }
 
+check_device () {
+devok="false"
+while [[ $devok == "false" ]] ; do
+  if test -b $devnm; then
+    echo "- $devnm exists another device name should be specified"
+    read -p "new device id: " devnm
+  else
+    echo "- $devnm is available moving foreward"
+    devok="true"
+    save_settings
+  fi
+done
+}
+
 make_iscsi_connection () {
   echo
   echo "Attempting the iSCSI connection"
@@ -115,6 +151,17 @@ make_iscsi_connection () {
   fi
   iscsi_conf="done"
   save_settings
+}
+
+check_iscsi_connections () {
+  iscsiadm -m session | grep $nasip
+  if [ $? != 0 ] ; then
+    echo "- no iSCSI connections from this machine to $nasip found to be logged in"
+    make_iscsi_connection
+  else 
+    echo "- found an active iSCSI connection to $nasip - halting the script so nothing gets corrupted - \"sudo iscsiadm -m node --logout \" will close the active sessions"
+    exit
+fi
 }
 
 adjust_iscsi_conf () {
@@ -166,9 +213,11 @@ EOF
 do_install () {
   clear
   echo "Beginning install ..."
-  #setup_initiator
-  #adjust_iscsi_conf
-  #make_iscsi_connection
+  setup_initiator
+  adjust_iscsi_conf
+  check_device
+  check_iscsi_connections
+  check_for_existing_UUID
   get_UUID
   update_fstab
 }
