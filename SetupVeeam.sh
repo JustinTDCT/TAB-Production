@@ -76,6 +76,7 @@ check_for_existing_UUID () {
       sudo parted --script $devnm "mkpart primary 0% 100%"
       echo "- formatting the partion"
       sudo mkfs.xfs -b size=4096 -m reflink=1,crc=1 $devnm -f -K
+      partitioned="done"
       save_settings
     else
       echo "Exiting script"
@@ -92,7 +93,7 @@ check_for_files () {
   files=$(find $mountpoint2 -name *.vbk | wc -l)
   if [ $files != "0" ] ; then
     echo "- VBK files found, skipping the partitioning of thise LUN"
-    partitioned="done"
+
   fi
 }
 
@@ -104,6 +105,8 @@ update_fstab () {
   sed -i '/$uuid/d' /etc/fstab
   echo "- adding new line to FSTAB"
   echo "/dev/disk/by-uuid/$uuid /mnt/veeamrepo xfs _netdev 0 0" >> /etc/fstab
+  fstab_updated="done"
+  save_settings
 }
 
 
@@ -209,10 +212,23 @@ EOF
   save_settings
 }
 
+check_nas_ip () {
+  echo "Testing NAS IP"
+  ping -c 5 -4 $nasip
+  if [ $? != 0 ] ; then
+    echo "- NAS IP did not respond to pings, exiting."
+    exist
+  else
+    echo : "- NAS IP responds to pings, moving ahead"
+    set_nasip="done"
+    save_settings
+  fi
+}
 
 do_install () {
   clear
   echo "Beginning install ..."
+  check_nas_ip
   setup_initiator
   adjust_iscsi_conf
   check_device
