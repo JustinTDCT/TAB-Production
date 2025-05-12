@@ -1,4 +1,4 @@
-  #!/bin/bash
+#!/bin/bash
 # check to ensure you are running as SUDO
 confini="/etc/tab/conf/default.ini"
 IPOK="no"
