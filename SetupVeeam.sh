@@ -228,9 +228,16 @@ check_nas_ip () {
 do_install () {
   clear
   echo "Beginning install ..."
-  check_nas_ip
-  setup_initiator
-  adjust_iscsi_conf
+  if [ $set_nasip != "done" ] ; then
+    check_nas_ip
+  fi
+  if [ $set_initiator != "done" ] ; then
+    setup_initiator
+  fi
+  if [ $iscsi_edited != "done" ] ; then
+    adjust_iscsi_conf
+  fi
+
   check_device
   check_iscsi_connections
   check_for_existing_UUID
