@@ -107,7 +107,7 @@ do
   o. STAGE: UUID Set: $set_uuid
   p. STAGE: Veeam User Created: $veeam_user
   q. STAGE: iSCSI Permissions Set: $veeam_perms
-  r. STAGE: Automate Instakked: $lt_installed
+  r. STAGE: Automate Installed: $lt_installed
   s. STAGE: FStab Updated: $fstab_updated
   t. STAGE: iSCSI Partitioned: $partitioned
   u. STAGE: iSCSI Config File Edited: $iscsi_edited
