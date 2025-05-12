@@ -1,4 +1,4 @@
-  #!/bin/bash
+#!/bin/bash
 # check to ensure you are running as SUDO
 confini="/etc/tab/conf/default.ini"
 IPOK="no"
@@ -173,7 +173,10 @@ do_install () {
   update_fstab
 }
 
-
+if [ "$EUID" -ne 0 ]
+  then echo "WARNING: This needs to be run as SUDO!"
+  exit
+fi
 
 clear
 get_settings
