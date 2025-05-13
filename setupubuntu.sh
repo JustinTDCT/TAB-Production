@@ -376,17 +376,17 @@ EOF
       menu="${menu,,}"
       case "$menu" in
       "a") if [ $inst_webmin == "yes" ]; then inst_webmin="no"; else inst_webmin="yes"; fi ;;
-      "a") if [ $inst_docker == "yes" ]; then inst_docker="no"; else inst_docker="yes"; fi ;;
-      "a") if [ $rst_tabadmin == "yes" ]; then rst_tabadmin="no"; else rst_tabadmin="yes"; fi ;;
-      "a") if [ $set_svrip == "yes" ]; then set_svrip="no"; else set_svrip="yes"; fi ;;
-      "a") if [ $inst_lt == "yes" ]; then inst_lt="no"; else inst_lt="yes"; fi ;;
-      "a") if [ $ud_scripts == "yes" ]; then ud_scripts="no"; else ud_scripts="yes"; fi ;;
-      "a") if [ $cr_initiator == "yes" ]; then cr_initiator="no"; else cr_initiator="yes"; fi ;;
-      "a") if [ $ud_iscsi == "yes" ]; then ud_iscsi="no"; else ud_iscsi="yes"; fi ;;
-      "a") if [ $cr_iscsi == "yes" ]; then cr_iscsi="no"; else cr_iscsi="yes"; fi ;;
-      "a") if [ $ud_fstab == "yes" ]; then ud_fstab="no"; else ud_fstab="yes"; fi ;;
-      "a") if [ $cr_veeamuser == "yes" ]; then cr_veeamuser="no"; else cr_veeamuser="yes"; fi ;;
-      "a") if [ $ud_perms == "yes" ]; then ud_perms="no"; else ud_perms="yes"; fi ;;
+      "b") if [ $inst_docker == "yes" ]; then inst_docker="no"; else inst_docker="yes"; fi ;;
+      "c") if [ $rst_tabadmin == "yes" ]; then rst_tabadmin="no"; else rst_tabadmin="yes"; fi ;;
+      "d") if [ $set_svrip == "yes" ]; then set_svrip="no"; else set_svrip="yes"; fi ;;
+      "e") if [ $inst_lt == "yes" ]; then inst_lt="no"; else inst_lt="yes"; fi ;;
+      "f") if [ $ud_scripts == "yes" ]; then ud_scripts="no"; else ud_scripts="yes"; fi ;;
+      "g") if [ $cr_initiator == "yes" ]; then cr_initiator="no"; else cr_initiator="yes"; fi ;;
+      "h") if [ $ud_iscsi == "yes" ]; then ud_iscsi="no"; else ud_iscsi="yes"; fi ;;
+      "i") if [ $cr_iscsi == "yes" ]; then cr_iscsi="no"; else cr_iscsi="yes"; fi ;;
+      "j") if [ $ud_fstab == "yes" ]; then ud_fstab="no"; else ud_fstab="yes"; fi ;;
+      "k") if [ $cr_veeamuser == "yes" ]; then cr_veeamuser="no"; else cr_veeamuser="yes"; fi ;;
+      "l") if [ $ud_perms == "yes" ]; then ud_perms="no"; else ud_perms="yes"; fi ;;
       "x") done="yes" ;;
       "!") done="yes" ;;
       *) echo "Invalid menu option!"
