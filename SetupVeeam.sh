@@ -137,7 +137,7 @@ make_iscsi_connection () {
   echo
   echo "Attempting the iSCSI connection"
   ls /etc/iscsi/send_targets/ | grep -v 10.150.125.74
-  if [ $? != 0 ] ; then
+  if [ $? == 0 ] ; then
     echo "- FAIL: Additional send targets listed in /etc/iscsi/send_targets; this can cause issues with scripted iSCSI setups; exiting!"
     exit
   else
@@ -258,6 +258,8 @@ do_install () {
   else
     echo "- iSCSI config file has been edit already"
   fi
+  echo "- logging out of iSCSI sessiosn if present to prevent overlap"
+  iscsiadm -m node --logout 
   if [ $iscsi_conf != "done" ] ; then
     check_device
     check_iscsi_connections
