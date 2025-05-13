@@ -58,3 +58,35 @@ keystroke () {
   echo "Press any key to continue ..."
   read -rsn1
 }
+
+# --------------------------------------------------[ Main program
+clear
+# check if being run as SUDO
+if [ "$EUID" -ne 0 ]
+  then echo "WARNING: This needs to be run as SUDO!"
+  exit
+fi
+
+while :
+do
+    clear
+    cat<<EOF
+  VM Setup Script $scriptver
+  =============================
+  a. Set install variables
+  b. Install routine menu
+
+  x. Exit
+  
+EOF
+    read -n1 -s menu
+    menu="${menu,,}"
+    case "$menu" in
+    "a") variables_menu ;;
+    "b") install_menu ;;
+    "x") clear
+         exit ;;
+    *) echo "Invalid menu option!"
+       keystroke ;;
+    esac
+done
