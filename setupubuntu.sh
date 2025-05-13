@@ -334,6 +334,67 @@ update_os () {
   fi
 }
 
+#--------------------------------------------------[ Install Menu
+install_menu () {
+  done="no"
+  inst_webmin="yes"
+  inst_docker="yes"
+  rst_tabadmin="no"
+  set_svrip="no"
+  inst_lt="yes"
+  ud_scripts="no"
+  cr_initiator="yes"
+  ud_iscsi="yes"
+  cr_iscsi="yes"
+  ud_fstab="yes"
+  cr_veeamuser="yes"
+  ud_perms="yes"
+  while [ $done == "no" ] 
+    do
+     clear
+     cat<<EOF
+  VM Setup Script $scriptver
+  =============================
+  a. Install Webmin: $inst_webmin
+  b. Install Docker: $inst_docker
+  c. Reset the TABADMIN password: $rst_tabadmin
+  d. Set the server IP: $set_svrip
+  e. Install the Automate Agent: $inst_lt
+  f. Update scripts: $ud_scripts
+  g. Create the iSCSI initiator: $cr_initiator
+  h. Edit iSCSI conf file: $ud_iscsi
+  i. Map iSCSI to $devnm: $cr_iscsi
+  j. Update FSTAB: $ud_fstab
+  k. Create VEEAMUSER: $cr_veeamuser
+  l. Set VEEAMUSER permissions: $ud_perms
+
+  x. Main Menu
+  !. Install the selected items
+  
+EOF
+      read -n1 -s menu
+      menu="${menu,,}"
+      case "$menu" in
+      "a") if [ $inst_webmin == "yes" ]; then inst_webmin="no"; else inst_webmin="yes"; fi ;;
+      "a") if [ $inst_docker == "yes" ]; then inst_docker="no"; else inst_docker="yes"; fi ;;
+      "a") if [ $rst_tabadmin == "yes" ]; then rst_tabadmin="no"; else rst_tabadmin="yes"; fi ;;
+      "a") if [ $set_svrip == "yes" ]; then set_svrip="no"; else set_svrip="yes"; fi ;;
+      "a") if [ $inst_lt == "yes" ]; then inst_lt="no"; else inst_lt="yes"; fi ;;
+      "a") if [ $ud_scripts == "yes" ]; then ud_scripts="no"; else ud_scripts="yes"; fi ;;
+      "a") if [ $cr_initiator == "yes" ]; then cr_initiator="no"; else cr_initiator="yes"; fi ;;
+      "a") if [ $ud_iscsi == "yes" ]; then ud_iscsi="no"; else ud_iscsi="yes"; fi ;;
+      "a") if [ $cr_iscsi == "yes" ]; then cr_iscsi="no"; else cr_iscsi="yes"; fi ;;
+      "a") if [ $ud_fstab == "yes" ]; then ud_fstab="no"; else ud_fstab="yes"; fi ;;
+      "a") if [ $cr_veeamuser == "yes" ]; then cr_veeamuser="no"; else cr_veeamuser="yes"; fi ;;
+      "a") if [ $ud_perms == "yes" ]; then ud_perms="no"; else ud_perms="yes"; fi ;;
+      "x") done="yes" ;;
+      "!") done="yes" ;;
+      *) echo "Invalid menu option!"
+         keystroke ;;
+      esac
+  done
+}
+
 #--------------------------------------------------[ Variables Menu
 variables_menu () {
   done="no"
@@ -344,7 +405,7 @@ variables_menu () {
   VM Setup Script $scriptver
   =============================
   a. Install Webmin: $webmin
-  b. Install Docker $docker
+  b. Install Docker: $docker
   c. New TABADMIN password: $tapw
   d. iSCSI device ID: $devnm
   e. NAS IP: $nasip
