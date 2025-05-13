@@ -2,6 +2,7 @@
 # check to ensure you are running as SUDO
 confini="/etc/tab/conf/default.ini"
 IPOK="no"
+iscsi_logged_in="no"
 
 get_settings () {
   echo "Loading settings ..."
@@ -95,6 +96,8 @@ check_for_files () {
   if [ $files != "0" ] ; then
     echo "- VBK files found; aborting further actions as this should be manually reviewed!"
     exit
+  else 
+    echo "- no files found, continuing"
   fi
 }
 
@@ -159,6 +162,7 @@ make_iscsi_connection () {
       echo "- No LUN targets found, script exiting as nothing can be done";
       exit
     fi
+    iscsi_logged_in="yes"
     iscsi_conf="done"
     save_settings
   fi
@@ -250,17 +254,17 @@ do_install () {
   if [ $set_nasip != "done" ] ; then
     check_nas_ip
   else
-    echo "- NAS IP $nasip already set and verified"
+    echo "====[ NAS IP $nasip already set and verified"
   fi
   if [ $set_initiator != "done" ] ; then
     setup_initiator
   else
-    echo "- iSCSI initiator configured already"
+    echo "====[ iSCSI initiator configured already"
   fi
   if [ $iscsi_edited != "done" ] ; then
     adjust_iscsi_conf
   else
-    echo "- iSCSI config file has been edit already"
+    echo "====[ iSCSI config file has been edit already"
   fi
   echo "- logging out of iSCSI sessiosn if present to prevent overlap"
   iscsiadm -m node --logout 
@@ -268,21 +272,26 @@ do_install () {
     check_device
     check_iscsi_connections
   else
-    echo "- device $devnm verified and iSCSI alreayd configured"
+    echo "====[ device $devnm verified and iSCSI alreayd configured"
   fi
   if [ $set_uuid != "done" ] ; then
     check_for_existing_UUID
     get_UUID
   else
-    echo "- UUID $UUID already done and assigned"
+    echo "====[ UUID $UUID already done and assigned"
   fi
   if [ $fstab_updated != "done" ] ; then
     update_fstab
   else
-    echo "- FSTAB has already been updated"
+    echo "====[ FSTAB has already been updated"
   fi
   check_mount_dir
   systemctl daemon-reload
+  echo "====[ Logging iSCSI in if it was not done yet"
+  if [ $iscsi_logged_in == "no" ] ; then
+    sudo iscsiadm -m node --login
+    sleep 1
+  fi
   mount -a
   check_for_files
 }
@@ -355,7 +364,7 @@ if [ $host == "none" ] ; then
   echo "- no hostname defined, please do so - this should be the host server or if this is a physical the ATN # ..."
   read -p "hv host name: " host ;
 fi
-read -p "Change the device namne - currently $devnm? [y/N] " -n1 -s chrtmp
+read -p "Change the device name - currently $devnm? [y/N] " -n1 -s chrtmp
 echo 
   if [ $chrtmp == "y" ] ; then
     read -p "new device id: " devnm
