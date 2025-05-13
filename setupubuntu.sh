@@ -79,22 +79,23 @@ first_run () {
 
 # --------------------------------------------------[ Procedure to get and check iSCSI device
 get_iscsi_device () {
-  formatok="no"
-  while [ $formatok != "yes" ]; do
-    read -p "Enter the new iSCSI device name: " devnm
-    if [[ "$devnm" =~ ^/dev/sd ]]; then
-      echo "- $devnm meets OK format rules, checking if it's available"
-      if test -b $devnm; then
-        echo "- FAILED: $devnm is in use, please use another device path"
-      else
-        echo "- verified not in use, saving"
-        save_settings
-        formatok="yes"
-      fi
+  read -p "Enter the new iSCSI device name: " devnm
+  if [[ "$devnm" =~ ^/dev/sd ]]; then
+    echo "- $devnm meets OK format rules, checking if it's available"
+    if test -b $devnm; then
+      echo "- FAILED: $devnm is in use, please use another device path"
+      devnm="/dev/sdb"
+      keystroke
     else
-      echo "- $devnm does no appear to be in \dev\sdX format, please try again"
+      echo "- verified not in use, saving"
+      save_settings
+      keystroke
     fi
-  done
+  else
+    echo "- $devnm does no appear to be in \dev\sdX format, please try again"
+    devnm="/dev/sdb"
+    keystroke
+  fi
 }
 
 # --------------------------------------------------[ Make sure an entered string is an IP
@@ -111,23 +112,59 @@ function checkIPFormat {
   fi
 }
 
+# --------------------------------------------------[ Procedure to get the hostname for the intiator
+get_hostname () {
+  read -p "Enter the parent host hostname or the ATN of this machine: " hostname
+}
+
+# --------------------------------------------------[ Procedure to get the iSCSI mount point
+get_mountpoint () {
+  read -p "Enter the new mount point to be used for iSCSI mapping: " mountpoint
+  echo "- checking if $mountpoint exists"
+  if [ -d $mountpoint]; then
+    echo "- this folder already exists, listing the contents"
+    ls $mountdir
+    echo
+    read -p "- check the above, do you want to continue using this folder? [y/N]" -n1 -s yesno
+    if [ $yesno == "y" ]; then
+      save_settings
+      keystroke
+    else mountpoint="/mnt/veeamrepo"
+    fi
+  else
+    echo "- folder does not exist, creating it"
+    mkdir -p $mountpoint
+    if [ $? != 0 ]; then
+      echo "- FAIL: unable to make folder $mountpoint"
+      keystroke
+    else
+      echo "- folder created"
+      save_settings
+      keystroke
+    fi
+  fi
+}
+
 # --------------------------------------------------[ Procedure to get the NAS IP
 get_nas_ip () {
-  while [ $IPOK == "no" ]; do 
-    read -p "Enter the new NAS IP (EX 192.168.165.123): " nasip
-    if checkIPFormat "${nasip}"; then
-      echo "- checking to make sure this IP can be pinged"
-      ping $nasip -c 5 -4
-      if [ $? != 0 ]; then
-        echo "- FAIL: IP does not answer pings, be sure it is online"
-        keystroke
-      else
-        echo "- IP is online, saving"
-        save_settings
-        IPOK="yes"
-      fi
+  read -p "Enter the new NAS IP (EX 192.168.165.123): " nasip
+  if checkIPFormat "${nasip}"; then
+    echo "- checking to make sure this IP can be pinged"
+    ping $nasip -c 5 -4
+    if [ $? != 0 ]; then
+      echo "- FAIL: IP does not answer pings, be sure it is online"
+      nasip="none"
+      keystroke
+    else
+      echo "- IP is online, saving"
+      set_nasip="done"
+      save_settings
+      keystroke
     fi
-  done
+  else
+    nasip="none"
+    keystroke;
+  fi
 }
 
 # --------------------------------------------------[ Variables Menu
@@ -164,6 +201,8 @@ EOF
       "c") read -p "enter the new TABADMIN password - NOTE: This does not change it for you just makes it easier to cut/paste later: " tapw ;;
       "d") get_iscsi_device ;;
       "e") get_nas_ip ;;
+      "f") get_hostname ;;
+      "g") get_mountpoint ;;
       "x") done="yes"; save_settings ;;
       "!") done="yes" ;;
       *) echo "Invalid menu option!"
