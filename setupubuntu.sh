@@ -77,6 +77,59 @@ first_run () {
   get_settings
 }
 
+# --------------------------------------------------[ Procedure to get and check iSCSI device
+get_iscsi_device () {
+  formatok="no"
+  while [ $formatok != "yes" ]; do
+    read -p "Enter the new iSCSI device name: " devnm
+    if [[ "$devnm" =~ ^/dev/sd ]]; then
+      echo "- $devnm meets OK format rules, checking if it's available"
+      if test -b $devnm; then
+        echo "- FAILED: $devnm is in use, please use another device path"
+      else
+        echo "- verified not in use, saving"
+        save_settings
+        formatok="yes"
+      fi
+    else
+      echo "- $devnm does no appear to be in \dev\sdX format, please try again"
+    fi
+  done
+}
+
+# --------------------------------------------------[ Make sure an entered string is an IP
+function checkIPFormat {
+  local ipCidr="${1}"
+  local validIpCidr
+  validIpCidr='(^([1-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5]))$'
+  if [[ $ipCidr =~ ^$validIpCidr ]]; then
+    echo "- $nasip appears to be a proper IP address"
+    return 0
+  else
+    echo "- $nasip is not a valid IP address"
+    return 1
+  fi
+}
+
+# --------------------------------------------------[ Procedure to get the NAS IP
+get_nas_ip () {
+  while [ $IPOK == "no" ]; do 
+    read -p "Enter the new NAS IP (EX 192.168.165.123): " nasip
+    if checkIPFormat "${nasip}"; then
+      echo "- checking to make sure this IP can be pinged"
+      ping $nasip -c 5 -4
+      if [ $? != 0 ]; then
+        echo "- FAIL: IP does not answer pings, be sure it is online"
+        keystroke
+      else
+        echo "- IP is online, saving"
+        save_settings
+        IPOK="yes"
+      fi
+    fi
+  done
+}
+
 # --------------------------------------------------[ Variables Menu
 variables_menu () {
   done="no"
@@ -104,7 +157,10 @@ EOF
       menu="${menu,,}"
       case "$menu" in
       "a") if [ $webmin == "yes" ]; then webmin="no"; else webmin="yes"; fi ;;
-      "b") install_menu ;;
+      "b") if [ $docker == "yes" ]; then docker="no"; else docker="yes"; fi ;;
+      "c") read -p "enter the new TABADMIN password - NOTE: This does not change it for you just makes it easier to cut/paste later: " tapw ;;
+      "d") get_iscsi_device ;;
+      "e") get_nas_ip ;;
       "x") done="yes"; save_settings ;;
       "!") done="yes" ;;
       *) echo "Invalid menu option!"
