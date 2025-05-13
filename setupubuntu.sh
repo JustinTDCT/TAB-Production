@@ -88,7 +88,7 @@ variables_menu () {
   =============================
   a. Install Webmin: $webmin
   b. Install Docker $docker
-  c. New TABADMIN password $tapw
+  c. New TABADMIN password: $tapw
   d. iSCSI device ID: $devnm
   e. NAS IP: $nasip
   f. Parent hostname: $hostname
@@ -97,14 +97,16 @@ variables_menu () {
   i. Desired IP of this server: $serverip
 
   x. Save & back to main menu
+  !. Exit without saving
   
 EOF
       read -n1 -s menu
       menu="${menu,,}"
       case "$menu" in
-      "a") variables_menu ;;
+      "a") if [ $webmin == "yes" ]; then webmin="no"; else webmin="yes"; fi ;;
       "b") install_menu ;;
-      "x") done="yes" ;;
+      "x") done="yes"; save_settings ;;
+      "!") done="yes" ;;
       *) echo "Invalid menu option!"
          keystroke ;;
       esac
@@ -129,8 +131,7 @@ if [ -f "/etc/tab/conf/default.ini" ]; then
 else
   first_run;
   keystroke
-  get_Settings
-  exit
+  get_settings
 fi
 
 while :
