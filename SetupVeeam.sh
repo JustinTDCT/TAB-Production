@@ -66,6 +66,32 @@ function checkIPFormat {
   fi
 }
 
+create_veeam_user () {
+  echo "====[ Creating Veeam user"
+  useradd veeamuser --create-home -s /bin/bash
+  if [ $? != 0 ] ; then
+    echo "- Something went wrong, user not created, exiting"
+    exit
+  else
+    read -p "enter the Veeam user password you would like (you originally wanted $vupw) "
+    passwd veeamuser
+    if [ $? != 0 ] ; then
+      echo "- The password did not save - moving ahead but you will need to try setting it again \"sudo passwd veeamuser\""
+    else
+      veeam_user="done"
+      save_settings
+    fi
+  fi
+}
+
+grant_sudo_to_veeam () {
+  echo "====[ Granting SUDO rights to Veeam user"
+  sudo usermod -a -G sudo veeamuser
+  if [ $? != 0 ]; then
+    echo "- was not able to assign rights, continuing on but this needs to be done prior to Veeam setup \"sudo usermod -a -G sudo veeamuser\"";
+  fi
+}
+
 check_for_existing_UUID () {
   echo "====[ Checking $devnm to see if it has a UUID and partition assigned to it"
   blkid | grep $devnm
@@ -294,7 +320,14 @@ do_install () {
   fi
   mount -a
   check_for_files
-}
+  if [ $veeamuser == "done" ] ; then
+    echo "====[ Veeam user already set up"
+  else
+    create_veeam_user
+    grant_sudo_to_veeam
+  fi
+  
+}  
 
 if [ "$EUID" -ne 0 ]
   then echo "WARNING: This needs to be run as SUDO!"
