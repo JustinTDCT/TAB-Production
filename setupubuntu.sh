@@ -314,9 +314,27 @@ EOF
       fi
     fi
   fi
+  keystroke
 }
 
-# --------------------------------------------------[ Variables Menu
+#--------------------------------------------------[ Procedite to update the OS
+update_os () {
+  echo "====[ Updating the OS"
+  if [ $update_os == "done" ] ; then
+    read -p "- Config shows updates was already done, do it anyway? [y/N] " -n1 -s yesno
+      if [ $yesno == "y" ]; then
+        apt update
+        apt upgrade -y
+      fi
+  else
+    apt update
+    apt upgrade -y
+    update_os="done"
+    save_settings
+  fi
+}
+
+#--------------------------------------------------[ Variables Menu
 variables_menu () {
   done="no"
   while [ $done == "no" ] 
@@ -394,8 +412,8 @@ do
   =============================
   a. Pre-install requirements
   b. Update OS
-  b. Set install variables
-  c. Install routine menu
+  c. Set install variables
+  d. Install routine menu
 
   x. Exit
   
@@ -404,6 +422,7 @@ EOF
     menu="${menu,,}"
     case "$menu" in
     "a") run_preinstall ;;
+    "b") update_os ;;
     "c") variables_menu ;;
     "d") install_menu ;;
     "x") clear
