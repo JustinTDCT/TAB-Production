@@ -59,13 +59,31 @@ keystroke () {
   read -rsn1
 }
 
+# --------------------------------------------------[ procedure for first time runnings
+first_run () {
+  clear
+  echo "THIS IS THE FIRST TIME THIS SCRIPT HAS BEEN RUN - NO INI CONFIG FILE FOUND - DOING CORE INSTALL"
+  # Create folder structure
+  echo "====[ Creating folders"
+  mkdir /etc/tab
+  mkdir /etc/tab/conf
+  mkdir /etc/tab/scripts
+  mkdir /etc/tab/logs
+  mkdir /tab_temp
+  # Grab the baseline config file and load it
+  echo "====[ Grabbing baseline config file"
+  wget -O /etc/tab/conf/default.ini https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/default.ini
+  echo "====[ Loading baseline config file"
+  get_settings
+}
+
 # --------------------------------------------------[ Variables Menu
-variable_menu () {
+variables_menu () {
   done="no"
   while [ $done == "no" ] 
-  do
+    do
      clear
-  cat<<EOF  
+     cat<<EOF
   VM Setup Script $scriptver
   =============================
   a. Install Webmin: $webmin
@@ -81,16 +99,16 @@ variable_menu () {
   x. Save & back to main menu
   
 EOF
-    read -n1 -s menu
-    menu="${menu,,}"
-    case "$menu" in
-    "a") variables_menu ;;
-    "b") install_menu ;;
-    "x") done="yes" ;;
-    *) echo "Invalid menu option!"
-       keystroke ;;
-    esac
-done
+      read -n1 -s menu
+      menu="${menu,,}"
+      case "$menu" in
+      "a") variables_menu ;;
+      "b") install_menu ;;
+      "x") done="yes" ;;
+      *) echo "Invalid menu option!"
+         keystroke ;;
+      esac
+  done
 }
 
 
@@ -100,6 +118,18 @@ clear
 # check if being run as SUDO
 if [ "$EUID" -ne 0 ]
   then echo "WARNING: This needs to be run as SUDO!"
+  exit
+fi
+
+# check for default ini file
+if [ -f "/etc/tab/conf/default.ini" ]; then
+  echo "This has been run before ... pulling configuration";
+  get_settings
+  keystroke
+else
+  first_run;
+  keystroke
+  get_Settings
   exit
 fi
 
