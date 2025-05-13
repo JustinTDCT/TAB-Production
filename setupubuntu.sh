@@ -249,6 +249,73 @@ get_dns2_ip () {
   fi
 }
 
+# --------------------------------------------------[ Procedure to run pre-install configuration
+run_preinstall () {
+  installok="no"
+  downloadok="yes"
+  echo "====[ Installing needed applications"
+  apt install htop unzip bmon default-jre crudini ncdu lsscsi -y
+  if [ $? != 0 ]; then
+    echo "- something failed, halting this process and returning to the main menu"
+  else
+    echo "====[ Disabling APT sharding for updates"
+    sudo cat > /etc/apt/apt.conf.d/99-disable-phasing <<EOF
+    Update-Manager::Always-Include-Phased-Updates true;
+    APT::Get::Always-Include-Phased-Updates true;
+EOF
+    if [ $? != 0 ]; then
+      echo "- something failed, halting this process and returning to the main menu"
+    else
+      echo "====[ Downloading scripts and marking executable"
+      #echo "- /etc/tab_scripts/SetupVeeam.sh"
+      #wget -O /etc/tab_scripts/SetupVeeamVM.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/SetupVeeamVM 2> /dev/null
+      echo "- /etc/tab/scripts/changeip.sh"
+      wget -O /etc/tab/scripts/changeip.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/ChangeIP.sh 2> /dev/null
+      if [ $? != 0 ]; then downloadok="no"; fi
+      echo "- /bin/bouncelt.sh"
+      wget -O /bin/bouncelt.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceLT.sh 2> /dev/null
+      if [ $? != 0 ]; then downloadok="no"; fi
+      echo "- /bin/bouncesc.sh"
+      wget -O /bin/bouncesc.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceSC.sh 2> /dev/null
+      if [ $? != 0 ]; then downloadok="no"; fi
+      echo "- /bin/nightlyactions.sh"
+      wget -O /bin/nightlyactions.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/NightlyActions.sh 2> /dev/null
+      if [ $? != 0 ]; then downloadok="no"; fi
+      echo "- /etc/tab/scripts/checkiscsi.sh"
+      wget -O /etc/tab/scripts/checkiscsi.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/CheckiSCSI.sh 2> /dev/null
+      if [ $? != 0 ]; then downloadok="no"; fi
+      echo "- /etc/tab/scripts/configedit.sh"
+      wget -O /etc/tab/scripts/configedit.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/ConfigEdit.sh 2> /dev/null
+      if [ $? != 0 ]; then downloadok="no"; fi
+      # make the files executable (8 files)
+      #chmod +xX /etc/tab/scripts/SetupVeeamVM.sh
+      chmod +xX /etc/tab/scripts/configedit.sh
+      if [ $? != 0 ]; then downloadok="no"; fi
+      chmod +xX /etc/tab/scripts/changeip.sh
+      if [ $? != 0 ]; then downloadok="no"; fi
+      chmod +xX /bin/bouncelt.sh
+      if [ $? != 0 ]; then downloadok="no"; fi
+      chmod +xX /bin/bouncesc.sh
+      if [ $? != 0 ]; then downloadok="no"; fi
+      chmod +xX /bin/nightlyactions.sh
+      if [ $? != 0 ]; then downloadok="no"; fi
+      chmod +xX /etc/tab/scripts/checkiscsi.sh    
+      if [ $downloadok == "no" ]; then
+        echo "- something in either the download or chmod failed, review the above and manually correct the issue when done in this script."
+      fi
+      echo "====[ Adjusting CRONTAB"
+      if [ $setup_cron != "done" ] ; then  
+        sed '22,$ d' /etc/crontab > /tab_temp/crontab2
+        mv /tab_temp/crontab2 /etc/crontab
+        echo "30 20 * * * root /bin/nightlyactions.sh" >> /etc/crontab
+        echo "10 * * * * root /etc/tab/scripts/checkiscsi.sh" >> /etc/crontab
+        setup_cron="done"
+        save_settings
+      fi
+    fi
+  fi
+}
+
 # --------------------------------------------------[ Variables Menu
 variables_menu () {
   done="no"
@@ -326,6 +393,7 @@ do
   VM Setup Script $scriptver
   =============================
   a. Pre-install requirements
+  b. Update OS
   b. Set install variables
   c. Install routine menu
 
@@ -335,8 +403,9 @@ EOF
     read -n1 -s menu
     menu="${menu,,}"
     case "$menu" in
-    "b") variables_menu ;;
-    "c") install_menu ;;
+    "a") run_preinstall ;;
+    "c") variables_menu ;;
+    "d") install_menu ;;
     "x") clear
          exit ;;
     *) echo "Invalid menu option!"
