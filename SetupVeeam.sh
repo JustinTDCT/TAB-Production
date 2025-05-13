@@ -66,6 +66,7 @@ function checkIPFormat {
 }
 
 check_for_existing_UUID () {
+  echo "====[ Checking $devnm to see if it has a UUID and partition assigned to it"
   blkid | grep $devnm
   if [ $? != 0 ] ; then
     echo "- no UUID has been found which means there is no recognized partition - do you want to make one? Saying no exits the script. [Y/n] "
@@ -89,7 +90,7 @@ check_for_existing_UUID () {
 
 
 check_for_files () {
-  echo "Checking for VBK files"
+  echo "====[ Checking for VBK files"
   files=$(find $mountpoint -name *.vbk | wc -l)
   if [ $files != "0" ] ; then
     echo "- VBK files found; aborting further actions as this should be manually reviewed!"
@@ -98,11 +99,11 @@ check_for_files () {
 }
 
 update_fstab () {
-  echo "Updating FSTAB"
+  echo "====[ Updating FSTAB"
   echo "- backing up file"
   find /etc/fstab -type f | xargs -I {} cp {} {}.bk_`date +%Y%m%d%H%M`
   echo "- removing existing line for $uuid"
-  sed -i '/$uuid/d' /etc/fstab
+  sed -i 'netdev' /etc/fstab
   echo "- adding new line to FSTAB"
   echo "/dev/disk/by-uuid/$uuid /mnt/veeamrepo xfs _netdev 0 0" >> /etc/fstab
   fstab_updated="done"
@@ -111,7 +112,7 @@ update_fstab () {
 
 
 get_UUID () {
-  echo "Retriving UUID"
+  echo "====[ Retriving UUID"
   uuid=$(blkid $devnm)
   uuid=`echo "$uuid" | cut -d'"' -f 2`
   echo "- UUID = $uuid for $devnm"
@@ -120,22 +121,23 @@ get_UUID () {
 }
 
 check_device () {
-devok="false"
-while [[ $devok == "false" ]] ; do
-  if test -b $devnm; then
-    echo "- $devnm exists another device name should be specified"
-    read -p "new device id: " devnm
-  else
-    echo "- $devnm is available moving foreward"
-    devok="true"
-    save_settings
-  fi
+  echo "====[ Checking if $devnm is in use by a device already"
+  devok="false"
+  while [[ $devok == "false" ]] ; do
+    if test -b $devnm; then
+      echo "- $devnm exists another device name should be specified"
+      read -p "new device id: " devnm
+    else
+      echo "- $devnm is available moving foreward"
+      devok="true"
+      save_settings
+    fi
 done
 }
 
 make_iscsi_connection () {
   echo
-  echo "Attempting the iSCSI connection"
+  echo "====[ Attempting the iSCSI connection"
   ls /etc/iscsi/send_targets/ | grep -v 10.150.125.74
   if [ $? == 0 ] ; then
     echo "- FAIL: Additional send targets listed in /etc/iscsi/send_targets; this can cause issues with scripted iSCSI setups; exiting!"
@@ -163,6 +165,7 @@ make_iscsi_connection () {
 }
 
 check_iscsi_connections () {
+  echo "====[ Checking iSCSI connections"
   iscsiadm -m session | grep $nasip
   if [ $? != 0 ] ; then
     echo "- no iSCSI connections from this machine to $nasip found to be logged in"
@@ -176,7 +179,7 @@ fi
 adjust_iscsi_conf () {
   echo
   conftemp=$(crudini --get /etc/iscsi/iscsid.conf "" node.startup)
-  echo "Checking and updating the iSCSI config file"
+  echo "====[ Checking and updating the iSCSI config file"
   if [ $conftemp == automatic ] ; then
     echo "- node startup is already automatic, moving on"
   else 
@@ -201,7 +204,7 @@ adjust_iscsi_conf () {
 
 setup_initiator () {
   echo
-  echo "Setting up the iSCSI initiator ..."
+  echo "====[ Setting up the iSCSI initiator ..."
   sudo cat > /etc/iscsi/initiatorname.iscsi <<EOF
 InitiatorName=iqn.2004-10.com.$host:veeamxfs01
 EOF
@@ -219,7 +222,7 @@ EOF
 }
 
 check_nas_ip () {
-  echo "Testing NAS IP"
+  echo "====[ Testing NAS IP"
   ping -c 5 -4 $nasip
   if [ $? != 0 ] ; then
     echo "- NAS IP did not respond to pings, exiting."
@@ -232,6 +235,7 @@ check_nas_ip () {
 }
 
 check_mount_dir () {
+  echo "====[ Checking $mountpoint to see if it exists"
   if [ -d $mountpoint ] ; then
     echo "- mountpoint already exists, will try to mount iSCSI"
   else
@@ -278,6 +282,7 @@ do_install () {
     echo "- FSTAB has already been updated"
   fi
   check_mount_dir
+  systemctl daemon-reload
   mount -a
   check_for_files
 }
