@@ -210,6 +210,45 @@ get_server_ip () {
   fi
 }
 
+# --------------------------------------------------[ Procedure to get the gateway IP
+get_gateway_ip () {
+  tempip=$gateway
+  read -p "Enter the new gateway IP (EX 192.168.165.123): " gateway
+  if checkIPFormat "${gateway}"; then
+    save_settings
+    keystroke
+  else
+    gateway=$tempip
+    keystroke;
+  fi
+}
+
+# --------------------------------------------------[ Procedure to get the DNS1 IP
+get_dns1_ip () {
+  tempip=$dns1
+  read -p "Enter the new DNS IP (EX 192.168.165.123): " dns1
+  if checkIPFormat "${dns1}"; then
+    save_settings
+    keystroke
+  else
+    dns1=$tempip
+    keystroke;
+  fi
+}
+
+# --------------------------------------------------[ Procedure to get the DNS2 IP
+get_dns2_ip () {
+  tempip=$dns2
+  read -p "Enter the new DNS IP (EX 192.168.165.123): " dns2
+  if checkIPFormat "${dns2}"; then
+    save_settings
+    keystroke
+  else
+    dns2=$tempip
+    keystroke;
+  fi
+}
+
 # --------------------------------------------------[ Variables Menu
 variables_menu () {
   done="no"
