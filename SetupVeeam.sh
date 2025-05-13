@@ -94,9 +94,6 @@ check_for_files () {
   if [ $files != "0" ] ; then
     echo "- VBK files found; aborting further actions as this should be manually reviewed!"
     exit
-  else
-    
-
   fi
 }
 
@@ -139,24 +136,30 @@ done
 make_iscsi_connection () {
   echo
   echo "Attempting the iSCSI connection"
-  echo "- Connecting to the iSCSI LUN"
-  sudo iscsiadm -m discovery -t sendtargets -p $nasip
-  # make sure the command worked and bail if it didn't
-  if [ $? != 0 ]; then
-    echo "- No LUN targets found, script exiting as nothing can be done";
+  ls /etc/iscsi/send_targets/ | grep -v 10.150.125.74
+  if [ $? != 0 ] ; then
+    echo "- FAIL: Additional send targets listed in /etc/iscsi/send_targets; this can cause issues with scripted iSCSI setups; exiting!"
     exit
+  else
+    echo "- Connecting to the iSCSI LUN"
+    sudo iscsiadm -m discovery -t sendtargets -p $nasip
+    # make sure the command worked and bail if it didn't
+    if [ $? != 0 ]; then
+      echo "- No LUN targets found, script exiting as nothing can be done";
+      exit
+    fi
+    echo
+    echo "- Logging in to iSCSI ..."
+    # connect to the LUNs
+    sudo iscsiadm -m node --login
+    # make sure the command worked and bail if it didn't
+    if [ $? != 0 ]; then
+      echo "- No LUN targets found, script exiting as nothing can be done";
+      exit
+    fi
+    iscsi_conf="done"
+    save_settings
   fi
-  echo
-  echo "- Logging in to iSCSI ..."
-  # connect to the LUNs
-  sudo iscsiadm -m node --login
-  # make sure the command worked and bail if it didn't
-  if [ $? != 0 ]; then
-    echo "- No LUN targets found, script exiting as nothing can be done";
-    exit
-  fi
-  iscsi_conf="done"
-  save_settings
 }
 
 check_iscsi_connections () {
@@ -273,7 +276,8 @@ do_install () {
     echo "- FSTAB has already been updated"
   fi
   check_mount_dir
-  #check_for_files
+  mount -a
+  check_for_files
 }
 
 if [ "$EUID" -ne 0 ]
