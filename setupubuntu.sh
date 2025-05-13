@@ -103,10 +103,10 @@ function checkIPFormat {
   local validIpCidr
   validIpCidr='(^([1-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5]))$'
   if [[ $ipCidr =~ ^$validIpCidr ]]; then
-    echo "- $nasip appears to be a proper IP address"
+    echo "- $1 appears to be a proper IP address"
     return 0
   else
-    echo "- $nasip is not a valid IP address"
+    echo "- $1 is not a valid IP address"
     return 1
   fi
 }
@@ -148,6 +148,9 @@ variables_menu () {
   g. iSCSI mount point: $mountpoint
   h. Automate Agent URL: $lturl
   i. Desired IP of this server: $serverip
+  j. Gateway IP to be used: $gateway
+  k. DNS server 1 to be used: $dns1
+  l. DNS server 2 to be used: $dns2
 
   x. Save & back to main menu
   !. Exit without saving
