@@ -90,9 +90,12 @@ check_for_existing_UUID () {
 
 check_for_files () {
   echo "Checking for VBK files"
-  files=$(find $mountpoint2 -name *.vbk | wc -l)
+  files=$(find $mountpoint -name *.vbk | wc -l)
   if [ $files != "0" ] ; then
-    echo "- VBK files found, skipping the partitioning of thise LUN"
+    echo "- VBK files found; aborting further actions as this should be manually reviewed!"
+    exit
+  else
+    
 
   fi
 }
@@ -225,6 +228,15 @@ check_nas_ip () {
   fi
 }
 
+check_mount_dir () {
+  if [ -d $mountpoint ] ; then
+    echo "- mountpoint already exists, will try to mount iSCSI"
+  else
+    echo "- mountpoint is not found, creating it"
+    mkdir $mountpoint
+  fi
+}
+
 do_install () {
   clear
   echo "Beginning install ..."
@@ -260,7 +272,8 @@ do_install () {
   else
     echo "- FSTAB has already been updated"
   fi
-  check_for_files
+  check_mount_dir
+  #check_for_files
 }
 
 if [ "$EUID" -ne 0 ]
