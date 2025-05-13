@@ -59,6 +59,42 @@ keystroke () {
   read -rsn1
 }
 
+# --------------------------------------------------[ Variables Menu
+variable_menu () {
+  done="no"
+  while [ $done == "no" ] 
+  do
+     clear
+  cat<<EOF  
+  VM Setup Script $scriptver
+  =============================
+  a. Install Webmin: $webmin
+  b. Install Docker $docker
+  c. New TABADMIN password $tapw
+  d. iSCSI device ID: $devnm
+  e. NAS IP: $nasip
+  f. Parent hostname: $hostname
+  g. iSCSI mount point: $mountpoint
+  h. Automate Agent URL: $lturl
+  i. Desired IP of this server: $serverip
+
+  x. Save & back to main menu
+  
+EOF
+    read -n1 -s menu
+    menu="${menu,,}"
+    case "$menu" in
+    "a") variables_menu ;;
+    "b") install_menu ;;
+    "x") done="yes" ;;
+    *) echo "Invalid menu option!"
+       keystroke ;;
+    esac
+done
+}
+
+
+
 # --------------------------------------------------[ Main program
 clear
 # check if being run as SUDO
@@ -73,8 +109,9 @@ do
     cat<<EOF
   VM Setup Script $scriptver
   =============================
-  a. Set install variables
-  b. Install routine menu
+  a. Pre-install requirements
+  b. Set install variables
+  c. Install routine menu
 
   x. Exit
   
@@ -82,8 +119,8 @@ EOF
     read -n1 -s menu
     menu="${menu,,}"
     case "$menu" in
-    "a") variables_menu ;;
-    "b") install_menu ;;
+    "b") variables_menu ;;
+    "c") install_menu ;;
     "x") clear
          exit ;;
     *) echo "Invalid menu option!"
