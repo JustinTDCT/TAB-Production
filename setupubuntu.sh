@@ -79,12 +79,13 @@ first_run () {
 
 # --------------------------------------------------[ Procedure to get and check iSCSI device
 get_iscsi_device () {
+  tempdev=$devnm
   read -p "Enter the new iSCSI device name: " devnm
   if [[ "$devnm" =~ ^/dev/sd ]]; then
     echo "- $devnm meets OK format rules, checking if it's available"
     if test -b $devnm; then
       echo "- FAILED: $devnm is in use, please use another device path"
-      devnm="/dev/sdb"
+      devnm=$tempdev
       keystroke
     else
       echo "- verified not in use, saving"
@@ -93,7 +94,7 @@ get_iscsi_device () {
     fi
   else
     echo "- $devnm does no appear to be in \dev\sdX format, please try again"
-    devnm="/dev/sdb"
+    devnm=$tempdev
     keystroke
   fi
 }
@@ -119,9 +120,10 @@ get_hostname () {
 
 # --------------------------------------------------[ Procedure to get the iSCSI mount point
 get_mountpoint () {
+  temppoint=$mountpoint
   read -p "Enter the new mount point to be used for iSCSI mapping: " mountpoint
   echo "- checking if $mountpoint exists"
-  if [ -d $mountpoint]; then
+  if [ -d $mountpoint ]; then
     echo "- this folder already exists, listing the contents"
     ls $mountdir
     echo
@@ -129,7 +131,7 @@ get_mountpoint () {
     if [ $yesno == "y" ]; then
       save_settings
       keystroke
-    else mountpoint="/mnt/veeamrepo"
+    else mountpoint=$temppoint
     fi
   else
     echo "- folder does not exist, creating it"
@@ -147,13 +149,14 @@ get_mountpoint () {
 
 # --------------------------------------------------[ Procedure to get the NAS IP
 get_nas_ip () {
+  tempip=$nasip
   read -p "Enter the new NAS IP (EX 192.168.165.123): " nasip
   if checkIPFormat "${nasip}"; then
     echo "- checking to make sure this IP can be pinged"
     ping $nasip -c 5 -4
     if [ $? != 0 ]; then
       echo "- FAIL: IP does not answer pings, be sure it is online"
-      nasip="none"
+      nasip=$tempip
       keystroke
     else
       echo "- IP is online, saving"
@@ -162,7 +165,7 @@ get_nas_ip () {
       keystroke
     fi
   else
-    nasip="none"
+    nasip=$tempip
     keystroke;
   fi
 }
