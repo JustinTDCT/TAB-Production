@@ -83,7 +83,7 @@ check_for_existing_UUID () {
       exit
     fi
   else
-    echo "- UUID exists moving ahead adn will try to mount this to see if there are files present"
+    echo "- UUID exists moving ahead and will try to mount this to see if there are files present"
   fi
 }
 
@@ -217,7 +217,7 @@ check_nas_ip () {
   ping -c 5 -4 $nasip
   if [ $? != 0 ] ; then
     echo "- NAS IP did not respond to pings, exiting."
-    exist
+    exit
   else
     echo : "- NAS IP responds to pings, moving ahead"
     set_nasip="done"
@@ -230,19 +230,37 @@ do_install () {
   echo "Beginning install ..."
   if [ $set_nasip != "done" ] ; then
     check_nas_ip
+  else
+    echo "- NAS IP $nasip already set and verified"
   fi
   if [ $set_initiator != "done" ] ; then
     setup_initiator
+  else
+    echo "- iSCSI initiator configured already"
   fi
   if [ $iscsi_edited != "done" ] ; then
     adjust_iscsi_conf
+  else
+    echo "- iSCSI config file has been edit already"
   fi
-
-  check_device
-  check_iscsi_connections
-  check_for_existing_UUID
-  get_UUID
-  update_fstab
+  if [ $iscsi_conf != "done" ] ; then
+    check_device
+    check_iscsi_connections
+  else
+    echo "- device $devnm verified and iSCSI alreayd configured"
+  fi
+  if [ $set_uuid != "done" ] ; then
+    check_for_existing_UUID
+    get_UUID
+  else
+    echo "- UUID $UUID already done and assigned"
+  fi
+  if [ $fstab_updated != "done" ] ; then
+    update_fstab
+  else
+    echo "- FSTAB has already been updated"
+  fi
+  check_for_files
 }
 
 if [ "$EUID" -ne 0 ]
