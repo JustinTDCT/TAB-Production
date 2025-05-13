@@ -80,6 +80,11 @@ function checkIPFormat {
   fi
 }
 
+if [ "$EUID" -ne 0 ]
+  then echo "WARNING: This needs to be run as SUDO!"
+  exit
+fi
+
 get_settings
 while :
 do
