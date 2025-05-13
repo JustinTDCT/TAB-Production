@@ -80,7 +80,7 @@ first_run () {
 # --------------------------------------------------[ Procedure to get and check iSCSI device
 get_iscsi_device () {
   tempdev=$devnm
-  read -p "Enter the new iSCSI device name: " devnm
+  read -p "Enter the new iSCSI device name (/dev/sdX format): " devnm
   if [[ "$devnm" =~ ^/dev/sd ]]; then
     echo "- $devnm meets OK format rules, checking if it's available"
     if test -b $devnm; then
@@ -96,6 +96,20 @@ get_iscsi_device () {
     echo "- $devnm does no appear to be in \dev\sdX format, please try again"
     devnm=$tempdev
     keystroke
+  fi
+}
+
+# --------------------------------------------------[ Make sure an entered string is an IP in CIDR format
+function checkCidrFormat {
+  local ipCidr="${1}"
+  local validIpCidr
+  validIpCidr='(^([1-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\.([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5])\/([1-9]|[1-2][0-9]|[3][0-2]))$'
+  if [[ $ipCidr =~ ^$validIpCidr ]]; then
+    echo "- $1 is a valid CIDR IP"
+    return 0
+  else
+    echo "- $1 is not a valid CIDR IP"
+    return 1
   fi
 }
 
@@ -121,13 +135,13 @@ get_hostname () {
 # --------------------------------------------------[ Procedure to get the iSCSI mount point
 get_mountpoint () {
   temppoint=$mountpoint
-  read -p "Enter the new mount point to be used for iSCSI mapping: " mountpoint
+  read -p "Enter the new mount point to be used for iSCSI mapping (should be in /mnt folder): " mountpoint
   echo "- checking if $mountpoint exists"
   if [ -d $mountpoint ]; then
     echo "- this folder already exists, listing the contents"
-    ls $mountdir
+    ls $mountpoint
     echo
-    read -p "- check the above, do you want to continue using this folder? [y/N]" -n1 -s yesno
+    read -p "- check the above, do you want to continue using this folder? [y/N] " -n1 -s yesno
     if [ $yesno == "y" ]; then
       save_settings
       keystroke
@@ -170,6 +184,32 @@ get_nas_ip () {
   fi
 }
 
+# --------------------------------------------------[ Procedure to get the server IP
+get_server_ip () {
+  tempip=$serverip
+  read -p "Enter the new server IP in CIDR format (EX 192.168.165.123/24): " serverip
+  if checkCidrFormat "${serverip}"; then
+    echo "- checking to make sure this IP is not in use"
+    pingip="${serverip%%"/"*}"
+    ping $pingip -c 5 -4
+    if [ $? != 0 ]; then
+      echo "- $serverip appears open"
+      save_settings
+      keystroke
+    else
+      read -p "- IP responds to pings, use it anyway? [y/N] " -n1 -s yesno
+      if [ $yesno == "y" ]; then
+        save_settings
+        keystroke
+      else serverip=$tempip
+      fi
+    fi
+  else
+    serverip=$tempip
+    keystroke
+  fi
+}
+
 # --------------------------------------------------[ Variables Menu
 variables_menu () {
   done="no"
@@ -201,11 +241,16 @@ EOF
       case "$menu" in
       "a") if [ $webmin == "yes" ]; then webmin="no"; else webmin="yes"; fi ;;
       "b") if [ $docker == "yes" ]; then docker="no"; else docker="yes"; fi ;;
-      "c") read -p "enter the new TABADMIN password - NOTE: This does not change it for you just makes it easier to cut/paste later: " tapw ;;
+      "c") read -p "Enter the new TABADMIN password - NOTE: This does not change it for you just makes it easier to cut/paste later: " tapw ;;
       "d") get_iscsi_device ;;
       "e") get_nas_ip ;;
       "f") get_hostname ;;
       "g") get_mountpoint ;;
+      "h") read -p "Enter the URL for the Automate Agent for this client: " lturl ;;
+      "i") get_server_ip ;;
+      "j") get_gateway_ip ;;
+      "k") get_dns1_ip ;;
+      "l") get_dns2_ip ;;
       "x") done="yes"; save_settings ;;
       "!") done="yes" ;;
       *) echo "Invalid menu option!"
