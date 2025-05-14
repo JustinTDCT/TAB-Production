@@ -356,15 +356,19 @@ do_install () {
     install_docker
   fi
   echo "====[ Resetting the TABADMIN password"
-  if [ $tapw == "none" ]; then
-    echo "- No password was defined so nothing to cut and paste"
-    passwd tabadmin
-    if [ $? != 0 ]; then
-      echo "- Password was not saved"
-    else
-      tapw="set"
-      tabadmin_pw="done"
-      save_settings
+  if [ $rst_tabadmin != "yes" ]; then
+    echo "- Skipping resetting the TABADMIN password"
+  else
+    if [ $tapw == "none" ]; then
+      echo "- No password was defined so nothing to cut and paste"
+      passwd tabadmin
+      if [ $? != 0 ]; then
+        echo "- Password was not saved"
+      else
+        tapw="set"
+        tabadmin_pw="done"
+        save_settings
+      fi
     fi
   fi
   echo "====[ Setting the server IP"
@@ -397,6 +401,7 @@ do_install () {
   else
     update_iscsi
   fi
+  keystroke
 }
 
 #--------------------------------------------------[ Install Menu
