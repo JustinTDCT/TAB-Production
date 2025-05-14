@@ -334,11 +334,68 @@ update_os () {
   fi
 }
 
+#--------------------------------------------------[ Procedure to do installs
+do_install () {
+  clear
+  echo "====[ Installing Webmin"
+  if [ $webmin != "yes" ]; then
+    echo "- Skipping WebMin install"
+  else
+    install_webmin
+  fi
+  echo "====[ Installing Docker"
+  if [ $docker != "yes" ]; then
+    echo "- Skipping Docker install"
+  else
+    install_docker
+  fi
+  echo "====[ Resetting the TABADMIN password"
+  if [ $tapw == "none" ]; then
+    echo "- No password was defined so nothing to cut and paste"
+    passwd tabadmin
+    if [ $? != 0 ]; then
+      echo "- Password was not saved"
+    else
+      tapw="set"
+      tabadmin_pw="done"
+      save_settings
+    fi
+  fi
+  echo "====[ Setting the server IP"
+  if [ $set_svrip != "yes" ]; then
+    echo "- Skipping server IP setup"
+  else
+    set_ip
+  fi
+  echo "====[ Installing the Automate Agent"
+  if [ $inst_lt != "yes" ]; then
+    echo "- Skipping installing Automate"
+  else
+    install_autoomate
+  fi
+  echo "====[ Updating scripts"
+  if [ $ud_scripts != "yes" ]; then
+    echo "- Skipping updating script files"
+  else
+    update_scripts
+  fi
+  echo "====[ Creating the iSCSI Initiator"
+  if [ $cr_initiator != "yes" ]; then
+    echo "- Skipping creating the iSCSI inititiator"
+  else
+    create_inititiator
+  fi
+  echo "====[ Updating the iSCSI conf file"
+  if [ $ud_iscsi != "yes" ]; then
+    echo "- Skipping updating the iSCSI confgi file"
+  else
+    update_iscsi
+  fi
+}
+
 #--------------------------------------------------[ Install Menu
 install_menu () {
   done="no"
-  inst_webmin="yes"
-  inst_docker="yes"
   rst_tabadmin="no"
   set_svrip="no"
   inst_lt="yes"
@@ -355,8 +412,8 @@ install_menu () {
      cat<<EOF
   VM Setup Script $scriptver
   =============================
-  a. Install Webmin: $inst_webmin
-  b. Install Docker: $inst_docker
+  a. Install Webmin: $webmin
+  b. Install Docker: $docker
   c. Reset the TABADMIN password: $rst_tabadmin
   d. Set the server IP: $set_svrip
   e. Install the Automate Agent: $inst_lt
