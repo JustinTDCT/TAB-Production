@@ -438,8 +438,8 @@ EOF
       read -n1 -s menu
       menu="${menu,,}"
       case "$menu" in
-      "a") if [ $inst_webmin == "yes" ]; then inst_webmin="no"; else inst_webmin="yes"; fi ;;
-      "b") if [ $inst_docker == "yes" ]; then inst_docker="no"; else inst_docker="yes"; fi ;;
+      "a") if [ $webmin == "yes" ]; then webmin="no"; else webmin="yes"; fi ;;
+      "b") if [ $docker == "yes" ]; then docker="no"; else docker="yes"; fi ;;
       "c") if [ $rst_tabadmin == "yes" ]; then rst_tabadmin="no"; else rst_tabadmin="yes"; fi ;;
       "d") if [ $set_svrip == "yes" ]; then set_svrip="no"; else set_svrip="yes"; fi ;;
       "e") if [ $inst_lt == "yes" ]; then inst_lt="no"; else inst_lt="yes"; fi ;;
@@ -451,7 +451,7 @@ EOF
       "k") if [ $cr_veeamuser == "yes" ]; then cr_veeamuser="no"; else cr_veeamuser="yes"; fi ;;
       "l") if [ $ud_perms == "yes" ]; then ud_perms="no"; else ud_perms="yes"; fi ;;
       "x") done="yes" ;;
-      "!") done="yes" ;;
+      "!") do_install; done="yes" ;;
       *) echo "Invalid menu option!"
          keystroke ;;
       esac
