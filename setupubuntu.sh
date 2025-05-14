@@ -340,6 +340,25 @@ update_os () {
   fi
 }
 
+#--------------------------------------------------[ Procedure to install Webmin
+install_webmin () {
+  echo "- Beginning install"
+  rm -f /usr/share/keyrings/webmin.gpg
+  curl -fsSL https://download.webmin.com/jcameron-key.asc | sudo gpg --dearmor -o /usr/share/keyrings/webmin.gpg
+  repos=$(tail  /etc/apt/sources.list | grep -m 1 "webmin")
+  if [[ "$repos" != "deb [signed-by=/usr/share/keyrings/webmin.gpg] http://download.webmin.com/download/repository sarge contrib" ]]; then
+    echo "- Adding WebMin to sources"
+    echo "deb [signed-by=/usr/share/keyrings/webmin.gpg] http://download.webmin.com/download/repository sarge contrib" >> /etc/apt/sources.list
+  else
+    echo "- Repo already added, skipping"
+  fi
+  apt update
+  apt install webmin -y
+  webmin="installed"
+  install_webmin="done"
+  save_settings
+}
+
 #--------------------------------------------------[ Procedure to do installs
 do_install () {
   clear
