@@ -249,6 +249,47 @@ get_dns2_ip () {
   fi
 }
 
+# --------------------------------------------------[ Procedure to update script files
+update_scripts () {
+  downloadok="yes"
+  #echo "- /etc/tab_scripts/SetupVeeam.sh"
+  #wget -O /etc/tab_scripts/SetupVeeamVM.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/SetupVeeamVM 2> /dev/null
+  echo "- /etc/tab/scripts/changeip.sh"
+  wget -O /etc/tab/scripts/changeip.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/ChangeIP.sh 2> /dev/null
+  if [ $? != 0 ]; then downloadok="no"; fi
+  echo "- /bin/bouncelt.sh"
+  wget -O /bin/bouncelt.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceLT.sh 2> /dev/null
+  if [ $? != 0 ]; then downloadok="no"; fi
+  echo "- /bin/bouncesc.sh"
+  wget -O /bin/bouncesc.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceSC.sh 2> /dev/null
+  if [ $? != 0 ]; then downloadok="no"; fi
+  echo "- /bin/nightlyactions.sh"
+  wget -O /bin/nightlyactions.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/NightlyActions.sh 2> /dev/null
+  if [ $? != 0 ]; then downloadok="no"; fi
+  echo "- /etc/tab/scripts/checkiscsi.sh"
+  wget -O /etc/tab/scripts/checkiscsi.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/CheckiSCSI.sh 2> /dev/null
+  if [ $? != 0 ]; then downloadok="no"; fi
+  echo "- /etc/tab/scripts/configedit.sh"
+  wget -O /etc/tab/scripts/configedit.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/ConfigEdit.sh 2> /dev/null
+  if [ $? != 0 ]; then downloadok="no"; fi
+  # make the files executable (8 files)
+  #chmod +xX /etc/tab/scripts/SetupVeeamVM.sh
+  chmod +xX /etc/tab/scripts/configedit.sh
+  if [ $? != 0 ]; then downloadok="no"; fi
+  chmod +xX /etc/tab/scripts/changeip.sh
+  if [ $? != 0 ]; then downloadok="no"; fi
+  chmod +xX /bin/bouncelt.sh
+  if [ $? != 0 ]; then downloadok="no"; fi
+  chmod +xX /bin/bouncesc.sh
+  if [ $? != 0 ]; then downloadok="no"; fi
+  chmod +xX /bin/nightlyactions.sh
+  if [ $? != 0 ]; then downloadok="no"; fi
+  chmod +xX /etc/tab/scripts/checkiscsi.sh    
+  if [ $downloadok == "no" ]; then
+    echo "- something in either the download or chmod failed, review the above and manually correct the issue when done in this script."
+  fi
+}
+
 # --------------------------------------------------[ Procedure to run pre-install configuration
 run_preinstall () {
   installok="no"
@@ -267,42 +308,7 @@ EOF
       echo "- something failed, halting this process and returning to the main menu"
     else
       echo "====[ Downloading scripts and marking executable"
-      #echo "- /etc/tab_scripts/SetupVeeam.sh"
-      #wget -O /etc/tab_scripts/SetupVeeamVM.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/SetupVeeamVM 2> /dev/null
-      echo "- /etc/tab/scripts/changeip.sh"
-      wget -O /etc/tab/scripts/changeip.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/ChangeIP.sh 2> /dev/null
-      if [ $? != 0 ]; then downloadok="no"; fi
-      echo "- /bin/bouncelt.sh"
-      wget -O /bin/bouncelt.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceLT.sh 2> /dev/null
-      if [ $? != 0 ]; then downloadok="no"; fi
-      echo "- /bin/bouncesc.sh"
-      wget -O /bin/bouncesc.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceSC.sh 2> /dev/null
-      if [ $? != 0 ]; then downloadok="no"; fi
-      echo "- /bin/nightlyactions.sh"
-      wget -O /bin/nightlyactions.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/NightlyActions.sh 2> /dev/null
-      if [ $? != 0 ]; then downloadok="no"; fi
-      echo "- /etc/tab/scripts/checkiscsi.sh"
-      wget -O /etc/tab/scripts/checkiscsi.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/CheckiSCSI.sh 2> /dev/null
-      if [ $? != 0 ]; then downloadok="no"; fi
-      echo "- /etc/tab/scripts/configedit.sh"
-      wget -O /etc/tab/scripts/configedit.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/ConfigEdit.sh 2> /dev/null
-      if [ $? != 0 ]; then downloadok="no"; fi
-      # make the files executable (8 files)
-      #chmod +xX /etc/tab/scripts/SetupVeeamVM.sh
-      chmod +xX /etc/tab/scripts/configedit.sh
-      if [ $? != 0 ]; then downloadok="no"; fi
-      chmod +xX /etc/tab/scripts/changeip.sh
-      if [ $? != 0 ]; then downloadok="no"; fi
-      chmod +xX /bin/bouncelt.sh
-      if [ $? != 0 ]; then downloadok="no"; fi
-      chmod +xX /bin/bouncesc.sh
-      if [ $? != 0 ]; then downloadok="no"; fi
-      chmod +xX /bin/nightlyactions.sh
-      if [ $? != 0 ]; then downloadok="no"; fi
-      chmod +xX /etc/tab/scripts/checkiscsi.sh    
-      if [ $downloadok == "no" ]; then
-        echo "- something in either the download or chmod failed, review the above and manually correct the issue when done in this script."
-      fi
+      update_scripts
       echo "====[ Adjusting CRONTAB"
       if [ $setup_cron != "done" ] ; then  
         sed '22,$ d' /etc/crontab > /tab_temp/crontab2
@@ -412,18 +418,18 @@ install_menu () {
      cat<<EOF
   VM Setup Script $scriptver
   =============================
-  a. Install Webmin: $webmin
-  b. Install Docker: $docker
-  c. Reset the TABADMIN password: $rst_tabadmin
-  d. Set the server IP: $set_svrip
-  e. Install the Automate Agent: $inst_lt
+  a. Install Webmin: $webmin -- previously done: $install_webmin
+  b. Install Docker: $docker -- previously done: $install_docker
+  c. Reset the TABADMIN password: $rst_tabadmin -- previously done: $tabadmin_pw
+  d. Set the server IP: $set_svrip -- previously done: $set_ip
+  e. Install the Automate Agent: $inst_lt -- previously done: $lt_installed
   f. Update scripts: $ud_scripts
-  g. Create the iSCSI initiator: $cr_initiator
-  h. Edit iSCSI conf file: $ud_iscsi
-  i. Map iSCSI to $devnm: $cr_iscsi
-  j. Update FSTAB: $ud_fstab
-  k. Create VEEAMUSER: $cr_veeamuser
-  l. Set VEEAMUSER permissions: $ud_perms
+  g. Create the iSCSI initiator: $cr_initiator -- previously done: $set_initiator
+  h. Edit iSCSI conf file: $ud_iscsi -- previously done: $iscsi_edited
+  i. Map iSCSI to $devnm: $cr_iscsi -- previously done: $iscsi_conf
+  j. Update FSTAB: $ud_fstab -- previously done: $fstab_updated
+  k. Create VEEAMUSER: $cr_veeamuser -- previously done: $veeam_user
+  l. Set VEEAMUSER permissions: $ud_perms -- previously done: $veeam_perms
 
   x. Main Menu
   !. Install the selected items
