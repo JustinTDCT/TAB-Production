@@ -668,16 +668,15 @@ create_veeam_user () {
     if [ $? != 0 ] ; then
       echo "- Something went wrong, user not created, exiting"  
       exit
-    else
-      read -p "enter the Veeam user password you would like (you originally wanted $vupw) "
-      passwd veeamuser
-      if [ $? != 0 ] ; then
-        echo "- The password did not save - moving ahead but you will need to try setting it again \"sudo passwd veeamuser\""
-      else
-        veeam_user="done"
-        save_settings
-      fi
     fi
+  fi
+  read -p "enter the Veeam user password you would like (you originally wanted $vupw) "
+  passwd veeamuser
+  if [ $? != 0 ] ; then
+    echo "- The password did not save - moving ahead but you will need to try setting it again \"sudo passwd veeamuser\""
+  else
+    veeam_user="done"
+    save_settings
   fi
 }
 
