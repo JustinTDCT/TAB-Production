@@ -768,21 +768,30 @@ do_install () {
     setup_initiator
     echo "- Done"
   fi
+  echo "==========[ Creating the iSCSI connections ]=========="
   if [ $cr_iscsi != "yes" ]; then
-    echo "-Shipping setting up the iSCSI connection"
+    echo "- Skipping setting up the iSCSI connection"
   else
-    check_iscsi_connections
-    echo "- Done"
+    if [ $set_initiator == "done" ]; then
+      check_iscsi_connections
+      echo "- Done"
+    else
+      echo "- iSCSI initiator has not been set aborting this part"
+    fi
   fi
   echo "==========[ Updating the UUID and FSTAB ]=========="
   if [ $ud_fstab != "yes" ]; then
     echo "- Skipping UUID / FSTAB updates"
   else
-    check_for_existing_UUID
-    get_UUID
-    check_for_files
-    update_fstab
-    echo "- Done"
+    if [ $iscsi_conf == "done" ]; then
+      check_for_existing_UUID
+      get_UUID
+      check_for_files
+      update_fstab
+      echo "- Done"
+    else
+      echo "- iSCSI has not been setup aboting this part"
+    fi
   fi
   echo "==========[ Creating the Veeam User ]=========="
   if [ $cr_veeamuser != "yes" ]; then
