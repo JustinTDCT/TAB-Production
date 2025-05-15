@@ -523,7 +523,7 @@ adjust_iscsi_conf () {
   fi
 }
 
-#--------------------------------------------------[ Procedure to do installs
+#--------------------------------------------------[ Procedure to make the iSCSI connections
 make_iscsi_connection () {
   echo "- Checking for prior saved iSCSI connections"
   ls /etc/iscsi/send_targets/ | grep -v $nasip
@@ -601,6 +601,50 @@ EOF
   check_iscsi_connections
 }
 
+#--------------------------------------------------[ Procedure to capture the UUID
+get_UUID () {
+  uuid=$(blkid $devnm)
+  uuid=`echo "$uuid" | cut -d'"' -f 2`
+  echo "- UUID = $uuid for $devnm"
+  set_uuid="done"
+  save_settings
+}
+
+#--------------------------------------------------[ Procedure to check for the UUID
+check_for_existing_UUID () {
+  blkid | grep $devnm
+  if [ $? != 0 ] ; then
+    echo "- no UUID has been found which means there is no recognized partition - do you want to make one? Saying no exits the script. [Y/n] "
+    read -rsn1 saveme
+    if [ $saveme == "y" ] ; then
+      echo "- making the new partition"
+      sudo parted --script $devnm "mklabel gpt"
+      sudo parted --script $devnm "mkpart primary 0% 100%"
+      echo "- formatting the partion"
+      sudo mkfs.xfs -b size=4096 -m reflink=1,crc=1 $devnm -f -K
+      partitioned="done"
+      save_settings
+    else
+      echo "Exiting script"
+      exit
+    fi
+  else
+    echo "- UUID exists moving ahead and will try to mount this to see if there are files present"
+  fi
+}
+
+#--------------------------------------------------[ Procedure to updat fstab
+Update_fstab () {
+  echo "- backing up original file"
+  find /etc/fstab -type f | xargs -I {} cp {} {}.bk_`date +%Y%m%d%H%M`
+  echo "- removing existing line for $uuid"
+  sed -i 'netdev' /etc/fstab
+  echo "- adding new line to FSTAB"
+  echo "/dev/disk/by-uuid/$uuid /mnt/veeamrepo xfs _netdev 0 0" >> /etc/fstab
+  fstab_updated="done"
+  save_settings
+}
+
 #--------------------------------------------------[ Procedure to do installs
 do_install () {
   clear
@@ -669,6 +713,14 @@ do_install () {
   else
     setup_initiator
     echo "- Done"
+  fi
+  echo "==========[ Updating the UUID and FSTAB ]=========="
+  if [ $ud_fstab != "yes" ]; then
+    echo "- Skipping UUID / FSTAB updates"
+  else
+    check_for_existing_UUID
+    get_UUID
+    update_fstab
   fi
   keystroke
 }
