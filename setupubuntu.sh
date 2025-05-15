@@ -611,6 +611,18 @@ install_menu () {
   k. Create VEEAMUSER: $cr_veeamuser -- previously done: $veeam_user
   l. Set VEEAMUSER permissions: $ud_perms -- previously done: $veeam_perms
 
+  Settings Configured
+  ------------------------------
+  iSCSI device ID: $devnm
+  NAS IP: $nasip
+  Parent hostname: $hostname
+  iSCSI mount point: $mountpoint
+  Automate Agent URL: $lturl
+  Desired IP of this server: $serverip
+  Gateway IP to be used: $gateway
+  DNS server 1 to be used: $dns1
+  DNS server 2 to be used: $dns2
+
   x. Main Menu
   !. Install the selected items
 
