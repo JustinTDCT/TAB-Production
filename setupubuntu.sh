@@ -194,18 +194,20 @@ get_server_ip () {
     ping $pingip -c 5 -4
     if [ $? != 0 ]; then
       echo "- $serverip appears open"
+      IPOK="yes"
       save_settings
       keystroke
     else
       read -p "- IP responds to pings, use it anyway? [y/N] " -n1 -s yesno
       if [ $yesno == "y" ]; then
+        IPOK="yes"
         save_settings
         keystroke
-      else serverip=$tempip
+      else serverip=$tempip; IPOK="no"
       fi
     fi
   else
-    serverip=$tempip
+    serverip=$tempip; IPOK="no"
     keystroke
   fi
 }
@@ -215,10 +217,11 @@ get_gateway_ip () {
   tempip=$gateway
   read -p "Enter the new gateway IP (EX 192.168.165.123): " gateway
   if checkIPFormat "${gateway}"; then
+    IPOK="yes"
     save_settings
     keystroke
   else
-    gateway=$tempip
+    gateway=$tempip; IPOK="no"
     keystroke;
   fi
 }
@@ -228,10 +231,12 @@ get_dns1_ip () {
   tempip=$dns1
   read -p "Enter the new DNS IP (EX 192.168.165.123): " dns1
   if checkIPFormat "${dns1}"; then
+    IPOK="yes"
     save_settings
     keystroke
   else
     dns1=$tempip
+    IPOK="no"
     keystroke;
   fi
 }
@@ -242,9 +247,11 @@ get_dns2_ip () {
   read -p "Enter the new DNS IP (EX 192.168.165.123): " dns2
   if checkIPFormat "${dns2}"; then
     save_settings
+    IPOK="yes"
     keystroke
   else
     dns2=$tempip
+    IPOK="no"
     keystroke;
   fi
 }
@@ -378,6 +385,125 @@ install_webmin () {
   save_settings
 }
 
+#--------------------------------------------------[ Procedure to set the IP
+set_ip () {
+  echo "====[ Setting the server IP"
+  if [ $serverip == "none" ]; then
+    echo "- Server IP is not set"
+    get_server_ip
+    if [ $IPOK == "no" ]; then
+      echo "- IP was not valid, aborting this script"
+      halt
+    fi
+  fi
+  if [ $gateway == "none" ]; then
+    echo " - Gateway IP not set"
+    get_gateway_ip
+    if [ $IPOK == "no" ]; then
+      echo "- IP was not valid, aborting this script"
+      halt
+    fi
+  fi
+  if [ $dns1 == "none" ]; then
+    echo "- DNS1 not set"
+    get_dns1_ip
+    if [ $IPOK == "no" ]; then
+      echo "- IP was not valid, aborting this script"
+      halt
+    fi
+  fi
+  if [ $dns2 == "none" ]; then
+    echo "- DNS2 not set"
+    get_dns2_ip
+    if [ $IPOK == "no" ]; then
+      echo "- IP was not valid, aborting this script"
+      halt
+    fi
+  fi
+  save_settings
+  echo "- Creating a backup of the current profile ..."
+  # Creates a backup
+  find /etc/netplan -type f | xargs -I {} mv {} {}.bk_`date +%Y%m%d%H%M`
+  # Changes dhcp from 'yes' to 'no'
+  echo "- Disabling DHCP"
+  sed -i "s/dhcp4: yes/dhcp4: no/g" /etc/netplan/00-installer-config.yaml
+  # Retrieves the NIC information
+  echo
+  echo "- Listing current IPs, take note of the interface for the NIC (should be eth0) ..."
+  ip address
+  echo
+  nic=`ip address | awk 'NR==7{print $2}'`
+  echo "- Working with" $nic
+  # Ask for input on network configuration
+  echo "- Using $serverip as the IP of this server ..."
+  keystroke
+  # creates the new YAML file for the IP
+  cat > /etc/netplan/00-installer-config.yaml <<EOF
+network:
+  ethernets:
+    $nic
+      addresses:
+      - $serverip
+      nameservers:
+        addresses: [$dns1,$dns2]
+      routes:
+      - to: default
+        via: $gateway
+  version: 2
+EOF
+  # sets permissions on the new file
+  chown root:root /etc/netplan/00-installer-config.yaml
+  chmod 700 /etc/netplan/00-installer-config.yaml
+  # applies the new file
+  sudo netplan apply
+  echo "- Pausing for 10sec then listing interfaces ..."
+  read -t10
+  # output the IP
+  ip address
+  set_ip="done"
+  save_settings
+}
+
+#--------------------------------------------------[ Procedure to indstall LT
+install_automate () {
+  echo "====[ Installing Automate"
+  cd /etc/tab
+  if [ $lturl == "none" ]; then
+    echo "- no URL has been set"
+    read -p "- Enter the URL for the Automate Agent for this client: " lturl
+    save_settings
+  fi
+  wget -O agent.zip $lturl
+  # make sure the command worked and bail if it didn't
+  if [ $? != 0 ]; then
+    echo "- Getting the LT agent failed, gonna quit this step.";
+    return
+  fi
+  # unzip the agent
+  unzip agent.zip
+  # make sure the command worked and bail if it didn't
+  if [ $? != 0 ]; then
+    echo "- Unzipping the agent failed, gonna quit.";
+    return
+  fi
+  cd LTechAgent/
+  # set the installer script as executable then run it
+  chmod +x install.sh
+  sudo ./install.sh
+  echo
+  echo "- Checking service status to see if it is running ..."
+  echo
+  systemctl status ltechagent | grep active
+  if [ $? != 0 ] ; then
+    echo "- Possible failure, cannot fin d the service running; leaving this uninstalled pending a manual review "
+  else 
+    echo "- Install done, you can verify in the thick client if desired."
+    keystroke
+    lt_installed="done"
+    save_settings
+  fi  
+}
+
 #--------------------------------------------------[ Procedure to do installs
 do_install () {
   clear
@@ -419,7 +545,7 @@ do_install () {
   if [ $inst_lt != "yes" ]; then
     echo "- Skipping installing Automate"
   else
-    install_autoomate
+    install_automate
   fi
   echo "====[ Updating scripts"
   if [ $ud_scripts != "yes" ]; then
