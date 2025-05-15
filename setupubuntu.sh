@@ -602,7 +602,8 @@ install_menu () {
 
   x. Main Menu
   !. Install the selected items
-  
+
+  NOTE: If an item shows 'installed' you can still select it to re-install or redo that step; the script will use stored values so be sure they are correct
 EOF
       read -n1 -s menu
       menu="${menu,,}"
