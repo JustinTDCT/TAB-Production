@@ -610,6 +610,18 @@ get_UUID () {
   save_settings
 }
 
+#--------------------------------------------------[ Procedure to check for existing files
+check_for_files () {
+  echo "- Checking for existing backup images"
+  files=$(find $mountpoint -name *.vbk | wc -l)
+  if [ $files != "0" ] ; then
+    echo "- VBK files found; aborting further actions as this should be manually reviewed!"
+    exit
+  else 
+    echo "- no files found, continuing"
+  fi
+}
+
 #--------------------------------------------------[ Procedure to check for the UUID
 check_for_existing_UUID () {
   blkid | grep $devnm
@@ -634,7 +646,7 @@ check_for_existing_UUID () {
 }
 
 #--------------------------------------------------[ Procedure to updat fstab
-Update_fstab () {
+update_fstab () {
   echo "- backing up original file"
   find /etc/fstab -type f | xargs -I {} cp {} {}.bk_`date +%Y%m%d%H%M`
   echo "- removing existing line for $uuid"
@@ -720,6 +732,7 @@ do_install () {
   else
     check_for_existing_UUID
     get_UUID
+    check_for_files
     update_fstab
   fi
   keystroke
