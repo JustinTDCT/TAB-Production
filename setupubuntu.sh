@@ -808,6 +808,7 @@ do_install () {
     set_veeam_user_perms
     echo "- Done"
   fi
+  mount -a
   keystroke
 }
 
