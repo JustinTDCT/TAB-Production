@@ -600,7 +600,6 @@ EOF
   keystroke
   set_initiator="done"
   save_settings
-  check_iscsi_connections
 }
 
 #--------------------------------------------------[ Procedure to capture the UUID
@@ -726,6 +725,12 @@ do_install () {
     echo "- Skipping creating the iSCSI inititiator"
   else
     setup_initiator
+    echo "- Done"
+  fi
+  if [ $cr_iscsi != "yes" ]; then
+    echo "-Shipping setting up the iSCSI connection"
+  else
+    check_iscsi_connections
     echo "- Done"
   fi
   echo "==========[ Updating the UUID and FSTAB ]=========="
