@@ -586,9 +586,12 @@ check_iscsi_connections () {
 
 #--------------------------------------------------[ Procedure to setupo the iSCSI initiator
 setup_initiator () {
+  echo "- Updating inititiator file"
   sudo cat > /etc/iscsi/initiatorname.iscsi <<EOF
 InitiatorName=iqn.2004-10.com.$host:veeamxfs01
 EOF
+  echo "- Restarting iSCSI service"
+  systemctl restart iscsid open-iscsi
   # make sure the command worked and bail if it didn't
   if [ $? != 0 ]; then
     echo "- FAIL: could not set the initiator exiting the script since nothing further can be done till that is fixed";
