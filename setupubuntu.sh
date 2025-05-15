@@ -19,6 +19,7 @@ get_settings () {
 save_settings () {
   echo "Saving settings ..."
   crudini --ini-options=nospace --set $confini "" scriptver \"$scriptver\"
+  crudini --ini-options=nospace --set $confini "" preinstall \"$preinstall\"
   crudini --ini-options=nospace --set $confini "" veeamxfs \"$veeamxfs\"
   crudini --ini-options=nospace --set $confini "" webmin \"$webmin\"
   crudini --ini-options=nospace --set $confini "" docker \"$docker\"
@@ -323,6 +324,7 @@ EOF
       echo "10 * * * * root /etc/tab/scripts/checkiscsi.sh" >> /etc/crontab
       setup_cron="done"
       preinstall="done"
+      echo "- done"
       save_settings
     fi
   fi
