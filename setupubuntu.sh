@@ -267,43 +267,21 @@ get_dns2_ip () {
 
 # --------------------------------------------------[ Procedure to update script files
 update_scripts () {
-  downloadok="yes"
-  #echo "- /etc/tab_scripts/SetupVeeam.sh"
-  #wget -O /etc/tab_scripts/SetupVeeamVM.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/SetupVeeamVM 2> /dev/null
-  echo "- /etc/tab/scripts/changeip.sh"
-  wget -O /etc/tab/scripts/changeip.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/ChangeIP.sh 2> /dev/null
-  if [ $? != 0 ]; then downloadok="no"; fi
-  echo "- /bin/bouncelt.sh"
+  # grab new files
+  echo "Grab new files ..." >> /etc/tab/log/nightlyactions.log
+  wget -O /etc/tab/scripts/setupubuntu.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/setupubuntu.sh 2> /dev/null
+  wget -O /etc/tab/scripts/healing.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/Healing.sh 2> /dev/null
   wget -O /bin/bouncelt.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceLT.sh 2> /dev/null
-  if [ $? != 0 ]; then downloadok="no"; fi
-  echo "- /bin/bouncesc.sh"
   wget -O /bin/bouncesc.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceSC.sh 2> /dev/null
-  if [ $? != 0 ]; then downloadok="no"; fi
-  echo "- /bin/nightlyactions.sh"
   wget -O /bin/nightlyactions.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/NightlyActions.sh 2> /dev/null
-  if [ $? != 0 ]; then downloadok="no"; fi
-  echo "- /etc/tab/scripts/checkiscsi.sh"
   wget -O /etc/tab/scripts/checkiscsi.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/CheckiSCSI.sh 2> /dev/null
-  if [ $? != 0 ]; then downloadok="no"; fi
-  echo "- /etc/tab/scripts/configedit.sh"
-  wget -O /etc/tab/scripts/configedit.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/ConfigEdit.sh 2> /dev/null
-  if [ $? != 0 ]; then downloadok="no"; fi
   # make the files executable (8 files)
-  #chmod +xX /etc/tab/scripts/SetupVeeamVM.sh
-  chmod +xX /etc/tab/scripts/configedit.sh
-  if [ $? != 0 ]; then downloadok="no"; fi
-  chmod +xX /etc/tab/scripts/changeip.sh
-  if [ $? != 0 ]; then downloadok="no"; fi
   chmod +xX /bin/bouncelt.sh
-  if [ $? != 0 ]; then downloadok="no"; fi
   chmod +xX /bin/bouncesc.sh
-  if [ $? != 0 ]; then downloadok="no"; fi
   chmod +xX /bin/nightlyactions.sh
-  if [ $? != 0 ]; then downloadok="no"; fi
-  chmod +xX /etc/tab/scripts/checkiscsi.sh    
-  if [ $downloadok == "no" ]; then
-    echo "- something in either the download or chmod failed, review the above and manually correct the issue when done in this script."
-  fi
+  chmod +xX /etc/tab/scripts/checkiscsi.sh
+  chmod +xX /etc/tab/scripts/setupubuntu.sh
+  chmod +xX /etc/tab/scripts/healing.sh
 }
 
 # --------------------------------------------------[ Procedure to run pre-install configuration
