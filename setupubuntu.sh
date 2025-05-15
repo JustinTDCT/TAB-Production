@@ -317,15 +317,13 @@ EOF
       echo "==========[ Downloading scripts and marking executable ]=========="
       update_scripts
       echo "==========[ Adjusting CRONTAB ]=========="
-      if [ $setup_cron != "done" ] ; then  
-        sed '22,$ d' /etc/crontab > /tab_temp/crontab2
-        mv /tab_temp/crontab2 /etc/crontab
-        echo "30 20 * * * root /bin/nightlyactions.sh" >> /etc/crontab
-        echo "10 * * * * root /etc/tab/scripts/checkiscsi.sh" >> /etc/crontab
-        setup_cron="done"
-        preinstall="done"
-        save_settings
-      fi
+      sed '22,$ d' /etc/crontab > /tab_temp/crontab2
+      mv /tab_temp/crontab2 /etc/crontab
+      echo "30 20 * * * root /bin/nightlyactions.sh" >> /etc/crontab
+      echo "10 * * * * root /etc/tab/scripts/checkiscsi.sh" >> /etc/crontab
+      setup_cron="done"
+      preinstall="done"
+      save_settings
     fi
   fi
   keystroke
