@@ -703,7 +703,7 @@ do
   VM Setup Script $scriptver
   =============================
   a. Pre-install requirements -- status: $preinstall
-  b. Update OS
+  b. Update OS -- status: $update_os
   c. Set install variables
   d. Install routine menu
 
