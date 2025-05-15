@@ -503,6 +503,8 @@ adjust_iscsi_conf () {
   conftemp=$(crudini --get /etc/iscsi/iscsid.conf "" node.startup)
   if [ $conftemp == automatic ] ; then
     echo "- node startup is already automatic, moving on"
+    iscsi_edited="done"
+    save_settings  
   else 
     echo "- node startup found to be $conftemp, setting to automatic"
     crudini --set /etc/iscsi/iscsid.conf "" node.startup automatic
