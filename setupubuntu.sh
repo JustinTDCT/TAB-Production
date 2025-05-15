@@ -160,6 +160,16 @@ get_mountpoint () {
   fi
 }
 
+# --------------------------------------------------[ Procedure to check the mount point
+check_mountpoint () {
+  echo "- Verifying the mount point"
+  if [ -d $mountpoint ]; then
+    echo "- Mountpoint verified as actual folder"
+  else
+    get_mountpoint
+  fi
+}
+
 # --------------------------------------------------[ Procedure to get the NAS IP
 get_nas_ip () {
   tempip=$nasip
@@ -487,6 +497,110 @@ install_automate () {
   fi  
 }
 
+#--------------------------------------------------[ Procedure to adjust the iSCSI config file
+adjust_iscsi_conf () {
+  echo
+  conftemp=$(crudini --get /etc/iscsi/iscsid.conf "" node.startup)
+  if [ $conftemp == automatic ] ; then
+    echo "- node startup is already automatic, moving on"
+  else 
+    echo "- node startup found to be $conftemp, setting to automatic"
+    crudini --set /etc/iscsi/iscsid.conf "" node.startup automatic
+    conftemp=$(crudini --get /etc/iscsi/iscsid.conf "" node.startup)
+    if [ $conftemp == automatic ] ; then
+      echo "- new setting confirmed, moving on"
+      iscsi_edited="done"
+      save_settings
+    else
+      echo "- the new setting did not take; install will continue but you need to manuallt set \"node.startup\" in the /etc/iscsi/iscsid.conf file to \"automatic\""
+    fi
+  fi
+  echo "- restarting the iSCSI service"
+  sudo systemctl restart iscsid open-iscsi
+  if [ $? != 0 ]; then
+    echo "- The service did not restart normally, since nothing more can be done the script will exit";
+    exit
+  fi
+}
+
+#--------------------------------------------------[ Procedure to do installs
+make_iscsi_connection () {
+  echo "- Checking for prior saved iSCSI connections"
+  ls /etc/iscsi/send_targets/ | grep -v $nasip
+  if [ $? == 0 ] ; then
+    read -p  "- Found saved sessions, should these be removed (answering \"yes\" will also close any open iSCSI sessions -- \"no\" will exit the script)? [Y/n] " -n1 -s yesno
+    if [ $yesno == "n" ]; then
+      echo "- exiting"
+      exit
+    else
+      echo "- Logging out connections"
+      iscsiadm -m node --logout
+      echo" - Removing old connection folders"
+      rm -r /etc/iscsi/nodes/
+      rm -r /etc/iscsi/send_targets/
+    fi
+  else
+    echo "- Connecting to the iSCSI LUN"
+    sudo iscsiadm -m discovery -t sendtargets -p $nasip
+    # make sure the command worked and bail if it didn't
+    if [ $? != 0 ]; then
+      echo "- No LUN targets found, script exiting as nothing can be done";
+      exit
+    fi
+    echo
+    echo "- Logging in to iSCSI ..."
+    # connect to the LUNs
+    sudo iscsiadm -m node --login
+    # make sure the command worked and bail if it didn't
+    if [ $? != 0 ]; then
+      echo "- No LUN targets found, script exiting as nothing can be done";
+      exit
+    fi
+    iscsi_logged_in="yes"
+    iscsi_conf="done"
+    save_settings
+  fi
+}
+
+#--------------------------------------------------[ Procedure to check for iSCSI connections
+check_iscsi_connections () {
+  echo "- Checking for active iSCSI sessions"
+  iscsiadm -m session | grep $nasip
+  if [ $? != 0 ] ; then
+    echo "- no iSCSI connections from this machine to $nasip found to be logged in"
+    make_iscsi_connection
+  else 
+    read -p  "- found an active iSCSI connection to $nasip - do you want to close them (saying \"no\" exits the script? [Y/n] " -n1 -s yesno
+    if [ $yesno == "n" ]; then
+      echo "- exiting"
+      exit
+    else
+      echo "- Logging out iSCSI connections"
+      iscsiadm -m node --logout
+      make_iscsi_connection
+    fi   
+  fi
+}
+
+#--------------------------------------------------[ Procedure to setupo the iSCSI initiator
+setup_initiator () {
+  sudo cat > /etc/iscsi/initiatorname.iscsi <<EOF
+InitiatorName=iqn.2004-10.com.$host:veeamxfs01
+EOF
+  # make sure the command worked and bail if it didn't
+  if [ $? != 0 ]; then
+    echo "- FAIL: could not set the initiator exiting the script since nothing further can be done till that is fixed";
+    exit
+  fi
+  initiator="InitiatorName=iqn.2004-10.com.$host:veeamxfs01"
+  echo "- Pausing the script while you verify that the initiator and LUN are set up in the NAS"
+  echo "- Initiator: $initiator"
+  keystroke
+  set_initiator="done"
+  save_settings
+  check_iscsi_connections
+}
+
 #--------------------------------------------------[ Procedure to do installs
 do_install () {
   clear
@@ -542,18 +656,18 @@ do_install () {
     update_scripts
     echo "- Done"
   fi
-  echo "==========[ Creating the iSCSI Initiator ]=========="
-  if [ $cr_initiator != "yes" ]; then
-    echo "- Skipping creating the iSCSI inititiator"
-  else
-    create_inititiator
-    echo "- Done"
-  fi
   echo "==========[ Updating the iSCSI conf file ]=========="
   if [ $ud_iscsi != "yes" ]; then
     echo "- Skipping updating the iSCSI confgi file"
   else
-    update_iscsi
+    adjust_iscsi_conf
+    echo "- Done"
+  fi
+  echo "==========[ Creating the iSCSI Initiator ]=========="
+  if [ $cr_initiator != "yes" ]; then
+    echo "- Skipping creating the iSCSI inititiator"
+  else
+    setup_initiator
     echo "- Done"
   fi
   keystroke
