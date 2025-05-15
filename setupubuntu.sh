@@ -324,7 +324,6 @@ EOF
       echo "10 * * * * root /etc/tab/scripts/checkiscsi.sh" >> /etc/crontab
       setup_cron="done"
       preinstall="done"
-      echo "- done"
       save_settings
     fi
   fi
@@ -512,12 +511,14 @@ do_install () {
     echo "- Skipping WebMin install"
   else
     install_webmin
+    echo "- Done"
   fi
   echo "==========[ Installing Docker ]=========="
   if [ $docker != "yes" ]; then
     echo "- Skipping Docker install"
   else
     install_docker
+    echo "- Done"
   fi
   echo "==========[ Resetting the TABADMIN password ]=========="
   if [ $rst_tabadmin != "yes" ]; then
@@ -534,36 +535,42 @@ do_install () {
         save_settings
       fi
     fi
+    echo "- Done"
   fi
   echo "==========[ Setting the server IP ]=========="
   if [ $set_svrip != "yes" ]; then
     echo "- Skipping server IP setup"
   else
     set_ip
+    echo "- Done"
   fi
   echo "==========[ Installing the Automate Agent ]=========="
   if [ $inst_lt != "yes" ]; then
     echo "- Skipping installing Automate"
   else
     install_automate
+    echo "- Done"
   fi
   echo "==========[ Updating scripts ]=========="
   if [ $ud_scripts != "yes" ]; then
     echo "- Skipping updating script files"
   else
     update_scripts
+    echo "- Done"
   fi
   echo "==========[ Creating the iSCSI Initiator ]=========="
   if [ $cr_initiator != "yes" ]; then
     echo "- Skipping creating the iSCSI inititiator"
   else
     create_inititiator
+    echo "- Done"
   fi
   echo "==========[ Updating the iSCSI conf file ]=========="
   if [ $ud_iscsi != "yes" ]; then
     echo "- Skipping updating the iSCSI confgi file"
   else
     update_iscsi
+    echo "- Done"
   fi
   keystroke
 }
