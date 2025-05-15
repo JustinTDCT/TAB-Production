@@ -661,18 +661,22 @@ update_fstab () {
 
 #--------------------------------------------------[ Procedure to create the veeam user
 create_veeam_user () {
-  useradd veeamuser --create-home -s /bin/bash
-  if [ $? != 0 ] ; then
-    echo "- Something went wrong, user not created, exiting"
-    exit
+  if id -u "veeamuser" >/dev/null 2>&1; then
+    echo "- veeamuser already exists"
   else
-    read -p "enter the Veeam user password you would like (you originally wanted $vupw) "
-    passwd veeamuser
+    useradd veeamuser --create-home -s /bin/bash
     if [ $? != 0 ] ; then
-      echo "- The password did not save - moving ahead but you will need to try setting it again \"sudo passwd veeamuser\""
+      echo "- Something went wrong, user not created, exiting"  
+      exit
     else
-      veeam_user="done"
-      save_settings
+      read -p "enter the Veeam user password you would like (you originally wanted $vupw) "
+      passwd veeamuser
+      if [ $? != 0 ] ; then
+        echo "- The password did not save - moving ahead but you will need to try setting it again \"sudo passwd veeamuser\""
+      else
+        veeam_user="done"
+        save_settings
+      fi
     fi
   fi
 }
@@ -778,7 +782,7 @@ do_install () {
     echo "- Done"
   fi
   echo "==========[ Creating the Veeam User ]=========="
-  if [ cr_veeamuser != "yes" ]; then
+  if [ $cr_veeamuser != "yes" ]; then
     echo "- Skipping Veeam user setup"
   else
     create_veeam_user
