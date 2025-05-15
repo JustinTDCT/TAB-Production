@@ -678,7 +678,7 @@ create_veeam_user () {
 }
 
 #--------------------------------------------------[ Procedure to set Veeam user permissions
-grant_sudo_to_veeam () {
+set_veeam_user_perms () {
   echo "- Granting Veeam user SUDO rights"
   sudo usermod -a -G sudo veeamuser
   if [ $? != 0 ]; then
@@ -782,6 +782,13 @@ do_install () {
     echo "- Skipping Veeam user setup"
   else
     create_veeam_user
+    echo "- Done"
+  fi
+  echo "==========[ Setting Veeam user permissions ]=========="
+  if [ $ud_perms != "yes" ]; then
+    echo "- Skipping setting Veeam user perms"
+  else
+    set_veeam_user_perms
     echo "- Done"
   fi
   keystroke
