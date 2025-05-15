@@ -583,15 +583,15 @@ do_install () {
 install_menu () {
   done="no"
   rst_tabadmin="no"
-  if [ $set_ip == "done" ]; then set_svrip="no"; else set_svrip="yes";
-  if [ $lt_installed == "done" ]; then inst_lt="no"; else inst_lt="yes";
+  if [ $set_ip == "done" ]; then set_svrip="no"; else set_svrip="yes"; fi; 
+  if [ $lt_installed == "done" ]; then inst_lt="no"; else inst_lt="yes"; fi;
   ud_scripts="no"
-  if [ $set_initiator == "done" ]; then cr_initiator="no"; else cr_initiator="yes";
-  if [ $iscsi_edited == "done" ]; then ud_iscsi="no"; else ud_iscsi="yes";
-  if [ $iscsi_conf == "done" ]; then cr_iscsi="no"; else cr_iscsi="yes";
-  if [ $fstab_updated == "done" ]; then ud_fstab="no"; else ud_fstab="yes";
-  if [ $veeam_user == "done" ]; then cr_veeamuser="no"; else cr_veeamuser="yes";
-  if [ $veeam_perms == "done" ]; then ud_perms="no"; else ud_perms="yes";
+  if [ $set_initiator == "done" ]; then cr_initiator="no"; else cr_initiator="yes"; fi;
+  if [ $iscsi_edited == "done" ]; then ud_iscsi="no"; else ud_iscsi="yes"; fi;
+  if [ $iscsi_conf == "done" ]; then cr_iscsi="no"; else cr_iscsi="yes"; fi;
+  if [ $fstab_updated == "done" ]; then ud_fstab="no"; else ud_fstab="yes"; fi;
+  if [ $veeam_user == "done" ]; then cr_veeamuser="no"; else cr_veeamuser="yes"; fi;
+  if [ $veeam_perms == "done" ]; then ud_perms="no"; else ud_perms="yes"; fi;
   while [ $done == "no" ] 
     do
      clear
