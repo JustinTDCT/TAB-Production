@@ -307,6 +307,7 @@ run_preinstall () {
   if [ $? != 0 ]; then
     echo "- something failed, halting this process and returning to the main menu"
   else
+    echo"- done"
     echo "==========[ Disabling APT sharding for updates ]=========="
     sudo cat > /etc/apt/apt.conf.d/99-disable-phasing <<EOF
     Update-Manager::Always-Include-Phased-Updates true;
@@ -315,8 +316,10 @@ EOF
     if [ $? != 0 ]; then
       echo "- something failed, halting this process and returning to the main menu"
     else
+      echo"- done"
       echo "==========[ Downloading scripts and marking executable ]=========="
       update_scripts
+      echo"- done"
       echo "==========[ Adjusting CRONTAB ]=========="
       sed '22,$ d' /etc/crontab > /tab_temp/crontab2
       mv /tab_temp/crontab2 /etc/crontab
@@ -324,6 +327,7 @@ EOF
       echo "10 * * * * root /etc/tab/scripts/checkiscsi.sh" >> /etc/crontab
       setup_cron="done"
       preinstall="done"
+      echo"- done"
       save_settings
     fi
   fi
