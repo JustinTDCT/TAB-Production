@@ -1,43 +1,45 @@
 #!/bin/bash
-# Version 2.01.02
-echo "=============================================================" >> /var/log/nightlyactions.log
-echo "=============================================================" >> /var/log/nightlyactions.log
-echo "=============================================================" >> /var/log/nightlyactions.log
-echo "$(date)" >> /var/log/nightlyactions.log
-echo "=============================================================" >> /var/log/nightlyactions.log
+confini="/etc/tab/conf/default.ini"
+# --------------------------------------------------[ procedure to load the config file
+get_settings () {
+  echo "- Loading settings ..."
+  source $confini
+}
+echo "=============================================================" >> /etc/tab/log/nightlyactions.log
+echo "=============================================================" >> /etc/tab/log/nightlyactions.log
+echo "=============================================================" >> /etc/tab/log/nightlyactions.log
+echo "$(date)" >> /etc/tab/log/nightlyactions.log
+echo "=============================================================" >> /etc/tab/log/nightlyactions.log
 # grab new files
-echo "Grab new files ..." >> /var/log/nightlyactions.log
-#echo "- /etc/tab_scripts/SetupVeeam.sh"
-#wget -O /etc/tab_scripts/SetupVeeamVM.sh https://raw.githubusercontent.com/JustinTDCT/Stuff-for-TAB/refs/heads/main/SetupVeeamVM 2> /dev/null
-wget -O /etc/tab/scripts/changeip.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/ChangeIP.sh 2> /dev/null 
-wget -O /etc/tab/scripts/setuplinuxvm.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/SetupLinuxVM.sh 2> /dev/null
+echo "Grab new files ..." >> /etc/tab/log/nightlyactions.log
+wget -O /etc/tab/scripts/setupubuntu.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/setupubuntu.sh 2> /dev/null
+wget -O /etc/tab/scripts/healing.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/Healing.sh 2> /dev/null
 wget -O /bin/bouncelt.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceLT.sh 2> /dev/null
 wget -O /bin/bouncesc.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceSC.sh 2> /dev/null
 wget -O /bin/nightlyactions.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/NightlyActions.sh 2> /dev/null
 wget -O /etc/tab/scripts/checkiscsi.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/CheckiSCSI.sh 2> /dev/null
 # make the files executable (8 files)
-#chmod +xX /etc/tab/scripts/SetupVeeamVM.sh
-chmod +xX /etc/tab/scripts/changeip.sh
-chmod +xX /etc/tab/scripts/setuplinuxvm.sh
 chmod +xX /bin/bouncelt.sh
 chmod +xX /bin/bouncesc.sh
 chmod +xX /bin/nightlyactions.sh
 chmod +xX /etc/tab/scripts/checkiscsi.sh
+chmod +xX /etc/tab/scripts/setupubuntu.sh
+chmod +xX /etc/tab/scripts/healing.sh
 # update cron
-echo "Updating cron ..." >> /var/log/nightlyactions.log
+echo "Updating cron ..." >> /etc/tab/log/nightlyactions.log
 sed '22,$ d' /etc/crontab > /tab_temp/crontab2
 mv /tab_temp/crontab2 /etc/crontab
 echo "30 20 * * * root /bin/nightlyactions.sh" >> /etc/crontab
 echo "10 * * * * root /etc/tab/scripts/checkiscsi.sh" >> /etc/crontab
 # kill LT
-echo "Restart LT (Check, kill, re-check) ..." >> /var/log/nightlyactions.log
-service ltechagent status >> /var/log/nightlyactions.log
+echo "Restart LT (Check, kill, re-check) ..." >> /etc/tab/log/nightlyactions.log
+service ltechagent status >> /etc/tab/log/nightlyactions.log
 pkill -9 ltechagent
-service ltechagent status >> /var/log/nightlyactions.log
+service ltechagent status >> /etc/tab/log/nightlyactions.log
 # restart LT
 /etc/init.d/ltechagent start
 service ltechagent start
-service ltechagent status >> /var/log/nightlyactions.log
+service ltechagent status >> /etc/tab/log/nightlyactions.log
 # get IP of server
 ip=$(ip -f inet -o addr show eth0|cut -d\  -f 7 | cut -d/ -f 1)
 # make motd
@@ -56,17 +58,17 @@ echo "- reset veeamuser password: sudo passwd veeamuser" >> /etc/motd
 echo "- manually trim filesystem: sudo fstrim /mnt/veeamrepo" >> /etc/motd
 echo "- fix LUN filesystem errors: sudo umount /dev/sdb; sudo xfs_repair /dev/sdb; sudo mount -a" >> /etc/motd
 echo "." >> /etc/motd
-echo "." >> /etc/motd
+echo "You can also run /etc/tab/scripts/healing.sh to perform self healing and LUN expansion" >> /etc/motd
 echo "." >> /etc/motd
 # update the OS
-echo "Update OS ..." >> /var/log/nightlyactions.log
+echo "Update OS ..." >> /etc/tab/log/nightlyactions.log
 apt update
 apt upgrade -y
 apt autoremove -y
 # check for reboot pending by file
-echo "=============================================================" >> /var/log/nightlyactions.log
-echo "Rebooting if needed ..." >> /var/log/nightlyactions.log
+echo "=============================================================" >> /etc/tab/log/nightlyactions.log
+echo "Rebooting if needed ..." >> /etc/tab/log/nightlyactions.log
 if [ -e /var/run/reboot-required ]; then 
-  echo "- Reboot required!" >> /var/log/nightlyactions.log
+  echo "- Reboot required!" >> /etc/tab/log/nightlyactions.log
   shutdown -r now
 fi
