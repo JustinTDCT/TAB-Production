@@ -693,8 +693,8 @@ set_veeam_user_perms () {
   fi
   echo "- Making Veeam user the owner of $mountpoint"
   chown -R veeamuser:veeamuser $mountpoint
-  echo "- Setting $mounpoint to lock it down to only the Veeam user"
-  chmod 700 $mounpoint
+  echo "- Setting $mountpoint to lock it down to only the Veeam user"
+  chmod 700 $mountpoint
   veeam_perms="done"
   save_settings
 }
