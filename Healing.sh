@@ -86,6 +86,29 @@ heal_iscsi_files () {
   fi
 }
 
+grow_xfs_volume () {
+  echo "Growing the file system to max available size"
+  xfs_growfs $devnm
+  if [ $? != 0 ]; then
+    echo "- WARNING: This did not complete ok"
+  else
+    echo "- command issued ok"
+  fi  
+}
+
+trim_xfs () {
+  echo "Issuing trim command"
+  fstrim $mountpoint
+  if [ $? != 0 ]; then
+    echo "- WARNING: This did not complete ok"
+  else
+    echo "- command issued ok"
+  fi
+}
+
+clear
+echo "============[ Running Self Healing ]============"
 get_settings
 heal_iscsi_files
-
+grow_xfs_volume
+trim_xfs
