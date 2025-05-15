@@ -606,7 +606,10 @@ install_menu () {
   x. Main Menu
   !. Install the selected items
 
-  NOTE: If an item shows 'installed' you can still select it to re-install or redo that step; the script will use stored values so be sure they are correct
+  NOTE: 
+  - If an item shows 'installed' you can still select it to re-install or redo that step; the script will use stored values so be sure they are correct
+  - If variables are not set (IE using default values) you will be prompted for the needed values
+
 EOF
       read -n1 -s menu
       menu="${menu,,}"
@@ -655,6 +658,9 @@ variables_menu () {
 
   x. Save & back to main menu
   !. Exit without saving
+
+  NOTE
+  - Please be sure to be accurate. The script will do its' best to verify the information but cannot account for everything
   
 EOF
       read -n1 -s menu
