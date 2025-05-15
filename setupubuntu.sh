@@ -659,6 +659,7 @@ update_fstab () {
   echo "- adding new line to FSTAB"
   echo "/dev/disk/by-uuid/$uuid /mnt/veeamrepo xfs _netdev 0 0" >> /etc/fstab
   fstab_updated="done"
+  systemctl daemon-reload
   save_settings
 }
 
