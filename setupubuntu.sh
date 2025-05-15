@@ -409,8 +409,8 @@ set_ip () {
   # Creates a backup
   find /etc/netplan -type f | xargs -I {} mv {} {}.bk_`date +%Y%m%d%H%M`
   # Changes dhcp from 'yes' to 'no'
-  echo "- Disabling DHCP"
-  sed -i "s/dhcp4: yes/dhcp4: no/g" /etc/netplan/00-installer-config.yaml
+  #echo "- Disabling DHCP"
+  #sed -i "s/dhcp4: yes/dhcp4: no/g" /etc/netplan/00-installer-config.yaml
   # Retrieves the NIC information
   echo
   echo "- Listing current IPs, take note of the interface for the NIC (should be eth0) ..."
