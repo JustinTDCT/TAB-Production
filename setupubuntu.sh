@@ -323,6 +323,7 @@ EOF
         echo "30 20 * * * root /bin/nightlyactions.sh" >> /etc/crontab
         echo "10 * * * * root /etc/tab/scripts/checkiscsi.sh" >> /etc/crontab
         setup_cron="done"
+        preinstall="done"
         save_settings
       fi
     fi
@@ -703,7 +704,7 @@ do
     cat<<EOF
   VM Setup Script $scriptver
   =============================
-  a. Pre-install requirements
+  a. Pre-install requirements -- status: $preinstall
   b. Update OS
   c. Set install variables
   d. Install routine menu
