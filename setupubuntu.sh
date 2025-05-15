@@ -11,7 +11,7 @@ iscsi_logged_in="no"
 
 # --------------------------------------------------[ procedure to load the config file
 get_settings () {
-  echo "Loading settings ..."
+  echo "- Loading settings ..."
   source $confini
 }
 
@@ -64,23 +64,23 @@ first_run () {
   clear
   echo "THIS IS THE FIRST TIME THIS SCRIPT HAS BEEN RUN - NO INI CONFIG FILE FOUND - DOING CORE INSTALL"
   # Create folder structure
-  echo "====[ Creating folders"
+  echo "==========[ Creating folders ]=========="
   mkdir /etc/tab
   mkdir /etc/tab/conf
   mkdir /etc/tab/scripts
   mkdir /etc/tab/logs
   mkdir /tab_temp
   # Grab the baseline config file and load it
-  echo "====[ Grabbing baseline config file"
+  echo "==========[ Grabbing baseline config file ]=========="
   wget -O /etc/tab/conf/default.ini https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/default.ini
-  echo "====[ Loading baseline config file"
+  echo "==========[ Loading baseline config file ]=========="
   get_settings
 }
 
 # --------------------------------------------------[ Procedure to get and check iSCSI device
 get_iscsi_device () {
   tempdev=$devnm
-  read -p "Enter the new iSCSI device name (/dev/sdX format): " devnm
+  read -p "- Enter the new iSCSI device name (/dev/sdX format): " devnm
   if [[ "$devnm" =~ ^/dev/sd ]]; then
     echo "- $devnm meets OK format rules, checking if it's available"
     if test -b $devnm; then
@@ -129,13 +129,13 @@ function checkIPFormat {
 
 # --------------------------------------------------[ Procedure to get the hostname for the intiator
 get_hostname () {
-  read -p "Enter the parent host hostname or the ATN of this machine: " hostname
+  read -p "- Enter the parent host hostname or the ATN of this machine: " hostname
 }
 
 # --------------------------------------------------[ Procedure to get the iSCSI mount point
 get_mountpoint () {
   temppoint=$mountpoint
-  read -p "Enter the new mount point to be used for iSCSI mapping (should be in /mnt folder): " mountpoint
+  read -p "- Enter the new mount point to be used for iSCSI mapping (should be in /mnt folder): " mountpoint
   echo "- checking if $mountpoint exists"
   if [ -d $mountpoint ]; then
     echo "- this folder already exists, listing the contents"
@@ -164,7 +164,7 @@ get_mountpoint () {
 # --------------------------------------------------[ Procedure to get the NAS IP
 get_nas_ip () {
   tempip=$nasip
-  read -p "Enter the new NAS IP (EX 192.168.165.123): " nasip
+  read -p "- Enter the new NAS IP (EX 192.168.165.123): " nasip
   if checkIPFormat "${nasip}"; then
     echo "- checking to make sure this IP can be pinged"
     ping $nasip -c 5 -4
@@ -187,7 +187,7 @@ get_nas_ip () {
 # --------------------------------------------------[ Procedure to get the server IP
 get_server_ip () {
   tempip=$serverip
-  read -p "Enter the new server IP in CIDR format (EX 192.168.165.123/24): " serverip
+  read -p "- Enter the new server IP in CIDR format (EX 192.168.165.123/24): " serverip
   if checkCidrFormat "${serverip}"; then
     echo "- checking to make sure this IP is not in use"
     pingip="${serverip%%"/"*}"
@@ -215,7 +215,7 @@ get_server_ip () {
 # --------------------------------------------------[ Procedure to get the gateway IP
 get_gateway_ip () {
   tempip=$gateway
-  read -p "Enter the new gateway IP (EX 192.168.165.123): " gateway
+  read -p "- Enter the new gateway IP (EX 192.168.165.123): " gateway
   if checkIPFormat "${gateway}"; then
     IPOK="yes"
     save_settings
@@ -229,7 +229,7 @@ get_gateway_ip () {
 # --------------------------------------------------[ Procedure to get the DNS1 IP
 get_dns1_ip () {
   tempip=$dns1
-  read -p "Enter the new DNS IP (EX 192.168.165.123): " dns1
+  read -p "- Enter the new DNS IP (EX 192.168.165.123): " dns1
   if checkIPFormat "${dns1}"; then
     IPOK="yes"
     save_settings
@@ -244,7 +244,7 @@ get_dns1_ip () {
 # --------------------------------------------------[ Procedure to get the DNS2 IP
 get_dns2_ip () {
   tempip=$dns2
-  read -p "Enter the new DNS IP (EX 192.168.165.123): " dns2
+  read -p "- Enter the new DNS IP (EX 192.168.165.123): " dns2
   if checkIPFormat "${dns2}"; then
     save_settings
     IPOK="yes"
@@ -301,12 +301,12 @@ update_scripts () {
 run_preinstall () {
   installok="no"
   downloadok="yes"
-  echo "====[ Installing needed applications"
+  echo "==========[ Installing needed applications ]=========="
   apt install htop unzip bmon default-jre crudini ncdu lsscsi -y
   if [ $? != 0 ]; then
     echo "- something failed, halting this process and returning to the main menu"
   else
-    echo "====[ Disabling APT sharding for updates"
+    echo "==========[ Disabling APT sharding for updates ]=========="
     sudo cat > /etc/apt/apt.conf.d/99-disable-phasing <<EOF
     Update-Manager::Always-Include-Phased-Updates true;
     APT::Get::Always-Include-Phased-Updates true;
@@ -314,9 +314,9 @@ EOF
     if [ $? != 0 ]; then
       echo "- something failed, halting this process and returning to the main menu"
     else
-      echo "====[ Downloading scripts and marking executable"
+      echo "==========[ Downloading scripts and marking executable ]=========="
       update_scripts
-      echo "====[ Adjusting CRONTAB"
+      echo "==========[ Adjusting CRONTAB ]=========="
       if [ $setup_cron != "done" ] ; then  
         sed '22,$ d' /etc/crontab > /tab_temp/crontab2
         mv /tab_temp/crontab2 /etc/crontab
@@ -332,7 +332,7 @@ EOF
 
 #--------------------------------------------------[ Procedite to update the OS
 update_os () {
-  echo "====[ Updating the OS"
+  echo "==========[ Updating the OS ]=========="
   if [ $update_os == "done" ] ; then
     read -p "- Config shows updates was already done, do it anyway? [y/N] " -n1 -s yesno
       if [ $yesno == "y" ]; then
@@ -349,7 +349,6 @@ update_os () {
 
 #--------------------------------------------------[ Procedure to install Docker
 install_docker () {
-  echo ========== Installing Docker ==========
   apt-get update
   apt-get install ca-certificates curl
   install -m 0755 -d /etc/apt/keyrings
@@ -387,7 +386,7 @@ install_webmin () {
 
 #--------------------------------------------------[ Procedure to set the IP
 set_ip () {
-  echo "====[ Setting the server IP"
+  echo "==========[ Setting the server IP ]=========="
   if [ $serverip == "none" ]; then
     echo "- Server IP is not set"
     get_server_ip
@@ -466,7 +465,7 @@ EOF
 
 #--------------------------------------------------[ Procedure to indstall LT
 install_automate () {
-  echo "====[ Installing Automate"
+  echo "==========[ Installing Automate ]=========="
   cd /etc/tab
   if [ $lturl == "none" ]; then
     echo "- no URL has been set"
@@ -507,19 +506,19 @@ install_automate () {
 #--------------------------------------------------[ Procedure to do installs
 do_install () {
   clear
-  echo "====[ Installing Webmin"
+  echo "=========[ Installing Webmin ]=========="
   if [ $webmin != "yes" ]; then
     echo "- Skipping WebMin install"
   else
     install_webmin
   fi
-  echo "====[ Installing Docker"
+  echo "==========[ Installing Docker ]=========="
   if [ $docker != "yes" ]; then
     echo "- Skipping Docker install"
   else
     install_docker
   fi
-  echo "====[ Resetting the TABADMIN password"
+  echo "==========[ Resetting the TABADMIN password ]=========="
   if [ $rst_tabadmin != "yes" ]; then
     echo "- Skipping resetting the TABADMIN password"
   else
@@ -535,31 +534,31 @@ do_install () {
       fi
     fi
   fi
-  echo "====[ Setting the server IP"
+  echo "==========[ Setting the server IP ]=========="
   if [ $set_svrip != "yes" ]; then
     echo "- Skipping server IP setup"
   else
     set_ip
   fi
-  echo "====[ Installing the Automate Agent"
+  echo "==========[ Installing the Automate Agent ]=========="
   if [ $inst_lt != "yes" ]; then
     echo "- Skipping installing Automate"
   else
     install_automate
   fi
-  echo "====[ Updating scripts"
+  echo "==========[ Updating scripts ]=========="
   if [ $ud_scripts != "yes" ]; then
     echo "- Skipping updating script files"
   else
     update_scripts
   fi
-  echo "====[ Creating the iSCSI Initiator"
+  echo "==========[ Creating the iSCSI Initiator ]=========="
   if [ $cr_initiator != "yes" ]; then
     echo "- Skipping creating the iSCSI inititiator"
   else
     create_inititiator
   fi
-  echo "====[ Updating the iSCSI conf file"
+  echo "==========[ Updating the iSCSI conf file ]=========="
   if [ $ud_iscsi != "yes" ]; then
     echo "- Skipping updating the iSCSI confgi file"
   else
@@ -659,12 +658,12 @@ EOF
       case "$menu" in
       "a") if [ $webmin == "yes" ]; then webmin="no"; else webmin="yes"; fi ;;
       "b") if [ $docker == "yes" ]; then docker="no"; else docker="yes"; fi ;;
-      "c") read -p "Enter the new TABADMIN password - NOTE: This does not change it for you just makes it easier to cut/paste later: " tapw ;;
+      "c") read -p "- Enter the new TABADMIN password - NOTE: This does not change it for you just makes it easier to cut/paste later: " tapw ;;
       "d") get_iscsi_device ;;
       "e") get_nas_ip ;;
       "f") get_hostname ;;
       "g") get_mountpoint ;;
-      "h") read -p "Enter the URL for the Automate Agent for this client: " lturl ;;
+      "h") read -p "- Enter the URL for the Automate Agent for this client: " lturl ;;
       "i") get_server_ip ;;
       "j") get_gateway_ip ;;
       "k") get_dns1_ip ;;
