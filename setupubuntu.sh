@@ -670,12 +670,13 @@ create_veeam_user () {
       exit
     fi
   fi
-  read -p "enter the Veeam user password you would like (you originally wanted $vupw) "
+  echo "- The config file has $vupw as the stored password (note this will be reset once set here)"
   passwd veeamuser
   if [ $? != 0 ] ; then
     echo "- The password did not save - moving ahead but you will need to try setting it again \"sudo passwd veeamuser\""
   else
     veeam_user="done"
+    vupw="set"
     save_settings
   fi
 }
