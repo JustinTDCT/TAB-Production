@@ -643,6 +643,7 @@ check_for_existing_UUID () {
     fi
   else
     echo "- UUID exists moving ahead and will try to mount this to see if there are files present"
+    check_for_files
   fi
 }
 
@@ -655,6 +656,39 @@ update_fstab () {
   echo "- adding new line to FSTAB"
   echo "/dev/disk/by-uuid/$uuid /mnt/veeamrepo xfs _netdev 0 0" >> /etc/fstab
   fstab_updated="done"
+  save_settings
+}
+
+#--------------------------------------------------[ Procedure to create the veeam user
+create_veeam_user () {
+  useradd veeamuser --create-home -s /bin/bash
+  if [ $? != 0 ] ; then
+    echo "- Something went wrong, user not created, exiting"
+    exit
+  else
+    read -p "enter the Veeam user password you would like (you originally wanted $vupw) "
+    passwd veeamuser
+    if [ $? != 0 ] ; then
+      echo "- The password did not save - moving ahead but you will need to try setting it again \"sudo passwd veeamuser\""
+    else
+      veeam_user="done"
+      save_settings
+    fi
+  fi
+}
+
+#--------------------------------------------------[ Procedure to set Veeam user permissions
+grant_sudo_to_veeam () {
+  echo "- Granting Veeam user SUDO rights"
+  sudo usermod -a -G sudo veeamuser
+  if [ $? != 0 ]; then
+    echo "- was not able to assign rights, continuing on but this needs to be done prior to Veeam setup \"sudo usermod -a -G sudo veeamuser\"";
+  fi
+  echo "- Making Veeam user the owner of $mountpoint"
+  chown -R veeamuser:veeamuser $mountpoint
+  echo "- Setting $mounpoint to lock it down to only the Veeam user"
+  chmod 700 $mounpoint
+  veeam_perms="done"
   save_settings
 }
 
@@ -741,6 +775,14 @@ do_install () {
     get_UUID
     check_for_files
     update_fstab
+    echo "- Done"
+  fi
+  echo "==========[ Creating the Veeam User ]=========="
+  if [ cr_veeamuser != "yes" ]; then
+    echo "- Skipping Veeam user setup"
+  else
+    create_veeam_user
+    echo "- Done"
   fi
   keystroke
 }
