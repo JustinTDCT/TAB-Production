@@ -40,6 +40,9 @@ save_settings () {
   crudini --ini-options=nospace --set $confini "" install_webmin \"$install_webmin\"
   crudini --ini-options=nospace --set $confini "" install_docker \"$install_docker\"
   crudini --ini-options=nospace --set $confini "" set_ip \"$set_ip\"
+  crudini --ini-options=nospace --set $confini "" gateway \"$gateway\"
+  crudini --ini-options=nospace --set $confini "" dns1 \"$dns1\"
+  crudini --ini-options=nospace --set $confini "" dns2 \"$dns2\"
   crudini --ini-options=nospace --set $confini "" tabadmin_pw \"$tabadmin_pw\"
   crudini --ini-options=nospace --set $confini "" set_nasip \"$set_nasip\"
   crudini --ini-options=nospace --set $confini "" set_initiator \"$set_initiator\"
@@ -126,11 +129,6 @@ function checkIPFormat {
     echo "- $1 is not a valid IP address"
     return 1
   fi
-}
-
-# --------------------------------------------------[ Procedure to get the hostname for the intiator
-get_hostname () {
-  read -p "- Enter the parent host hostname or the ATN of this machine: " hostname
 }
 
 # --------------------------------------------------[ Procedure to get the iSCSI mount point
@@ -390,38 +388,21 @@ install_webmin () {
 
 #--------------------------------------------------[ Procedure to set the IP
 set_ip () {
-  echo "==========[ Setting the server IP ]=========="
   if [ $serverip == "none" ]; then
     echo "- Server IP is not set"
     get_server_ip
-    if [ $IPOK == "no" ]; then
-      echo "- IP was not valid, aborting this script"
-      halt
-    fi
   fi
   if [ $gateway == "none" ]; then
     echo " - Gateway IP not set"
     get_gateway_ip
-    if [ $IPOK == "no" ]; then
-      echo "- IP was not valid, aborting this script"
-      halt
-    fi
   fi
   if [ $dns1 == "none" ]; then
     echo "- DNS1 not set"
     get_dns1_ip
-    if [ $IPOK == "no" ]; then
-      echo "- IP was not valid, aborting this script"
-      halt
-    fi
   fi
   if [ $dns2 == "none" ]; then
     echo "- DNS2 not set"
     get_dns2_ip
-    if [ $IPOK == "no" ]; then
-      echo "- IP was not valid, aborting this script"
-      halt
-    fi
   fi
   save_settings
   echo "- Creating a backup of the current profile ..."
@@ -665,7 +646,7 @@ variables_menu () {
   c. New TABADMIN password: $tapw
   d. iSCSI device ID: $devnm
   e. NAS IP: $nasip
-  f. Parent hostname: $hostname
+  f. Parent hostname: $host
   g. iSCSI mount point: $mountpoint
   h. Automate Agent URL: $lturl
   i. Desired IP of this server: $serverip
@@ -685,7 +666,7 @@ EOF
       "c") read -p "- Enter the new TABADMIN password - NOTE: This does not change it for you just makes it easier to cut/paste later: " tapw ;;
       "d") get_iscsi_device ;;
       "e") get_nas_ip ;;
-      "f") get_hostname ;;
+      "f") read -p "- Enter the parent host hostname or the ATN of this machine: " host ;;
       "g") get_mountpoint ;;
       "h") read -p "- Enter the URL for the Automate Agent for this client: " lturl ;;
       "i") get_server_ip ;;
