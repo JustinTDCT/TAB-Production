@@ -419,8 +419,7 @@ set_ip () {
   nic=`ip address | awk 'NR==7{print $2}'`
   echo "- Working with" $nic
   # Ask for input on network configuration
-  echo "- Using $serverip as the IP of this server ..."
-  keystroke
+  echo "- Using $serverip as the IP of this server, $gateway as the gateway and $dns1,$dns2 as DNS"
   # creates the new YAML file for the IP
   cat > /etc/netplan/00-installer-config.yaml <<EOF
 network:
