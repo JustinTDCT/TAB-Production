@@ -268,7 +268,7 @@ get_dns2_ip () {
 # --------------------------------------------------[ Procedure to update script files
 update_scripts () {
   # grab new files
-  echo "Grab new files ..." >> /etc/tab/log/nightlyactions.log
+  echo "Grab new files ..."
   wget -O /etc/tab/scripts/setupubuntu.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/setupubuntu.sh 2> /dev/null
   wget -O /etc/tab/scripts/healing.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/Healing.sh 2> /dev/null
   wget -O /bin/bouncelt.sh https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/BounceLT.sh 2> /dev/null
@@ -305,7 +305,7 @@ EOF
       echo "- done"
       echo "==========[ Downloading scripts and marking executable ]=========="
       update_scripts
-      echo"- done"
+      echo "- done"
       echo "==========[ Adjusting CRONTAB ]=========="
       sed '22,$ d' /etc/crontab > /tab_temp/crontab2
       mv /tab_temp/crontab2 /etc/crontab
