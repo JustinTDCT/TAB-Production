@@ -74,6 +74,7 @@ first_run () {
   mkdir /etc/tab/scripts
   mkdir /etc/tab/logs
   mkdir /tab_temp
+  rm -r /etc/tab_scripts
   # Grab the baseline config file and load it
   echo "==========[ Grabbing baseline config file ]=========="
   wget -O /etc/tab/conf/default.ini https://raw.githubusercontent.com/JustinTDCT/TAB-Production/refs/heads/main/default.ini
